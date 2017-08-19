@@ -4,7 +4,7 @@
  * combine
  *
  * Alias for Object.assign
- * @param  {Objects} args - multiple objects
+ * @param  {Objects} args - object(s)
  * @return {Object} - final object
  */
 const combine = (...args) => Object.assign({}, ...args);
@@ -46,11 +46,13 @@ const countArr = (num) => Array.from(Array(num).keys());
  */
 const elt = (type, attributes, textContent) => {
   const _elt = document.createElement(type);
+  // Set each key as attr
   if (attributes) {
     keys(attributes).forEach(key => {
       _elt.setAttribute(key, attributes[key]);
     });
   }
+  // Allow text content
   if (textContent) {
     _elt.textContent = textContent;
   }
@@ -212,12 +214,21 @@ const buildUrl = (baseUrl, options) => {
   return fullQuery;
 };
 
-/** View **/
-
+/**
+ * view
+ *
+ * Render main tree from model
+ * Generate content depending on
+ * whether selectedPatient prop exists
+ * in model
+ *
+ * @param  {Object} model - main model
+ * @return {Node} - DOM node
+ */
 const view = (model) => {
   // View 1. For main view
   if (!model.selectedPatient) {
-    return mainView(model);
+    return fullView(model);
   }
   // View 2. For selected patient
   else {
@@ -226,15 +237,15 @@ const view = (model) => {
 };
 
 /**
- * mainView
+ * fullView
  *
- * Render view with all data (and search fields)
+ * Render search controls, table view & pagination
+ * controls
  * @param  {Object} model
- * @return {Node} - main app
+ * @return {Node} - DOM node
  */
-const mainView = (model) => {
-
-  // Create Container
+const fullView = (model) => {
+  // Assign container
   const main = elt('div');
   // Build top search view
   const searchView = elt('div');
@@ -242,7 +253,7 @@ const mainView = (model) => {
   searchView.appendChild(clearSearchButton());
   main.appendChild(searchView);
 
-  // Do not continue if still loading
+  // Do not continue if data still loading!
   if (!model.data) {
     main.appendChild(loadingSpinner());
     return main;
@@ -344,8 +355,8 @@ const selectedView = (model) => {
 /** View Components **/
 
 const loadingSpinner = () => {
-  const spinner = elt('span');
-  spinner.innerHTML = 'Loading';
+  const spinner = elt('span', null, 'Loading...');
+  spinner.innerHTML = 'Loading...';
   return spinner;
 };
 
@@ -353,17 +364,15 @@ const loadingSpinner = () => {
  * clearSearchButton
  *
  * Render a 'clear' button component.
- * Allow event listener for click event
- * to trigger clear search term
+ * Allow event listener for click
+ * to trigger clear search query
  * @return {Node} - dom node
  */
 const clearSearchButton = () => {
-  const button = elt('button');
-  button.innerHTML = 'Clear';
-  button.addEventListener('click', (e) => {
+  const button = elt('button', null, 'Clear');
+  button.addEventListener('click', e => {
     e.preventDefault();
     update({type: CLEAR_SEARCH});
-
   });
   return button;
 };
@@ -372,8 +381,8 @@ const clearSearchButton = () => {
  * clearButtonView
  *
  * Render a 'clear' button component.
- * Allow event listener for click event
- * to trigger clear search term
+ * Allow event listener for click
+ * to trigger clear patient in model
  * @return {Node} - dom node
  */
 const clearPatientButton = () => {
@@ -387,11 +396,12 @@ const clearPatientButton = () => {
 };
 
 /**
- * searchInputView
+ * searchControls
  *
- * Render a search input component.
- * Allow event listener for change event
- * to trigger set search term
+ * Render all of the input
+ * field & select components
+ * Bind event listeners to
+ * set search query
  * @return {Node} - dom node
  */
 
@@ -448,18 +458,19 @@ const searchControls = (model) => {
     selects[field].options.forEach(option => {
       // Add options
       // Set value to label option
+      // Use 'selected' key on an option that matches
+      // associated value in model
       select.appendChild(elt('option', selects[field].value === option.value ? { selected: true } : null, option.label));
     });
-    // Add an empty element for removing query
+    // Allow empty option, select it if nothing selected in model
     select.appendChild(elt('option', selects[field].value ? null : { selected: true }, 'Choose an option...'));
     select.addEventListener('change', e => {
-      // Call update with updated searchQuery object
-      // Assign the corresponding select field the new selected value
-      // Update the lastModified key to indicate this is the
-      // latest control key that has been altered
+      // Find value from label by searching model
       const valueFromLabel = selects[field].options.find(x => x.label === e.target.value);
 
+      // Don't run any query if user selects empty option
       if (!valueFromLabel) return;
+      // search query requires a modified searchQuery object
       update({type: SET_SEARCH_QUERY, payload: combine(model.searchQuery,
         {
           selects: {
@@ -473,13 +484,22 @@ const searchControls = (model) => {
         })
       });
     });
+    // Add additional label
     selectContainer.appendChild(elt('label', {name: field, for: field}, field));
     selectContainer.appendChild(select);
+    // Render
     main.appendChild(selectContainer);
   });
   return main;
 };
 
+/**
+ * pagination
+ *
+ * A simple select menu creator for page
+ * selection
+ * @return {Node}  - dom node
+ */
 const pagination = (model) => {
   const main = elt('div');
   // Extract total pages
@@ -493,30 +513,29 @@ const pagination = (model) => {
     select.appendChild(elt('option', number === num ? { selected: true } : null, num.toString() ));
   });
   select.addEventListener('change', (e) => {
-    // Call update with updated searchQuery object
-    // Assign the corresponding select field the new selected value
-    // Update the lastModified key to indicate this is the
-    // latest control key that has been altered
+    // Modify searchQuery with newly selected page
     update({type: SET_SEARCH_QUERY, payload: combine(model.searchQuery, {page: e.target.value})});
   });
+  // Add a label
   selectContainer.appendChild(elt('label', null, 'Page'));
   selectContainer.appendChild(select);
+  // Render
   main.appendChild(selectContainer);
   return main;
 };
 
 /**
- * _update (internal- called by main update)
+ * update
  *
- * Takes msg object, (with msg type & payload)
+ * Takes msg object,
  * Calls internal function with global model.
  * This sesolves with two-item array -
  *
  * 0 - new msg (if any)
  * 1 - new model
  *
- * Which is then used to set GLOBAL_MODEL & render
- * view.
+ * Which is then used to set GLOBAL_MODEL to new model &
+ * call view function
  *
  * @param  {Object} msg - containing type & (optional) payload
  * @return {Promise}
@@ -590,10 +609,11 @@ const update = (_msg = {type: NO_OP}) => {
       }
     });
 
-  // Main return
+  // Run Promise
   return new Promise(res => {
-  // Fire update call
+    // Fire update
     _update(_msg, GLOBAL_MODEL)
+      // Continue with (optional newMsg & newModel)
       .then(([newMsg, newModel]) => {
         log('MSG PROCESSED: ', _msg, 'NEWMODEL: ', newModel);
         // UPDATE GLOBAL_MODEL
@@ -618,13 +638,13 @@ const update = (_msg = {type: NO_OP}) => {
  * Allow main dom element to be injected
  * with view
  *
- * @param {Node} app - main app node
+ * @param {Node} viewNode - node returned by view function
  */
-const render = (app) => {
+const render = (viewNode) => {
   // Reset
   GLOBAL_DOM_HOOK.innerHTML = '';
   // Build
-  GLOBAL_DOM_HOOK.appendChild(app);
+  GLOBAL_DOM_HOOK.appendChild(viewNode);
 };
 
 /**
@@ -637,5 +657,5 @@ const init = () => {
   update({type: GET_DATA_REQUEST});
 };
 
-// Init app
+// Initialise
 init();
