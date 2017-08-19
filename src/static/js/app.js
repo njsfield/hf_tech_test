@@ -24,6 +24,16 @@ const keys = Object.keys;
 const log = (...args) => console.log(...args);
 
 /**
+ * countArr
+ *
+ * generate incremental array from integer
+ * e.g. countArr(3) => [0,1,2]
+ * @param  {num} num - increment amount (last item = num-1)
+ * @return {Array} - integer array
+ */
+const countArr = (num) => Array.from(Array(num).keys());
+
+/**
  * elt
  *
  * Create a DOM element,
@@ -126,7 +136,8 @@ const initialModel = {
   searchQuery: {
     inputs: inputOptions,
     selects: selectOptions,
-    lastModified: 'firstName'
+    lastModified: 'firstName',
+    page: 0
   },
   baseUrl: 'https://api.interview.healthforge.io:443/api/patient',
   selectedPatient: null,
@@ -186,6 +197,7 @@ const buildUrl = (baseUrl, options) => {
     lastName: options.inputs.lastName.value,
     zipCode: options.inputs.zipCode.value,
     sort: options.selects.sort.value,
+    page: options.page
   };
 
   if (keys(flattened).some(x => flattened[x]) === false) {
@@ -266,7 +278,7 @@ const mainView = (model) => {
   });
   // Combine
   main.appendChild(tableView);
-  // main.appendChild(pagination(model)); // @TODO: Add pagination
+  main.appendChild(pagination(model));
   return main;
 };
 
@@ -408,7 +420,8 @@ const searchControls = (model) => {
               label: inputs[field].label
             }
           }),
-          lastModified: field
+          lastModified: field,
+          page: 0
         })
       });
     });
@@ -455,7 +468,8 @@ const searchControls = (model) => {
               options: selects[field].options
             }
           },
-          lastModified: field
+          lastModified: field,
+          page: 0
         })
       });
     });
@@ -463,6 +477,31 @@ const searchControls = (model) => {
     selectContainer.appendChild(select);
     main.appendChild(selectContainer);
   });
+  return main;
+};
+
+const pagination = (model) => {
+  const main = elt('div');
+  // Extract total pages
+  const { totalPages, number } = model.data;
+
+  const selectContainer = elt('div');
+  const select = elt('select', {class: 'outline-0'});
+  countArr(totalPages).forEach(num => {
+    // Add options
+    // Set selected if num equal to number in model
+    select.appendChild(elt('option', number === num ? { selected: true } : null, num.toString() ));
+  });
+  select.addEventListener('change', (e) => {
+    // Call update with updated searchQuery object
+    // Assign the corresponding select field the new selected value
+    // Update the lastModified key to indicate this is the
+    // latest control key that has been altered
+    update({type: SET_SEARCH_QUERY, payload: combine(model.searchQuery, {page: e.target.value})});
+  });
+  selectContainer.appendChild(elt('label', null, 'Page'));
+  selectContainer.appendChild(select);
+  main.appendChild(selectContainer);
   return main;
 };
 
