@@ -26,6 +26,20 @@ const routes = {
 
 _log('ROUTES INITIALISED', _log.obj(routes));
 
+/**
+ * serve
+ *
+ * Reads a file & writes to response object
+ * for client. If file is a view file,
+ * compile its contents into the specified layout
+ * file
+ *
+ * If any errors reading files, reply
+ * with 404 to client
+ *
+ * @param  {String} _path - absolute path of file
+ * @param  {Object} res - response object for client
+ */
 const serve = (_path, res) => {
   getFile(_path)
     .then(file => {
@@ -49,7 +63,20 @@ const serve = (_path, res) => {
     });
 };
 
-module.exports = (req,res) => {
+/**
+ * Router
+ *
+ * Basic router to parse URI from
+ * request object.
+ *
+ * Composes absolute path names depending
+ * on whether request is for static
+ * file of html (view)
+ *
+ * @param  {Object} req - request object
+ * @param  {Object} res - response object
+ */
+const router = (req,res) => {
   // Extract pathname from uri
   const uri = url.parse(req.url).pathname;
   _log('URI: ', uri);
@@ -76,3 +103,5 @@ module.exports = (req,res) => {
     }
   }
 };
+
+module.exports = router;
