@@ -1,135 +1,141 @@
 /** Utils **/
 
+/**
+ * combine
+ *
+ * Alias for Object.assign
+ * @param  {Objects} args - multiple objects
+ * @return {Object} - final object
+ */
 const combine = (...args) => Object.assign({}, ...args);
+
+/**
+ * keys
+ * alias for Object.keys
+ */
+const keys = Object.keys;
+
+/**
+ * log
+ *
+ * Alias for console.log
+ * @param  {string} args - any args
+ */
 const log = (...args) => console.log(...args);
-const classyElt = (type, classString) => {
-  const elt = document.createElement(type);
-  elt.className = classString;
-  return elt;
+
+/**
+ * elt
+ *
+ * Create a DOM element,
+ * (optional) allow attributes to be set
+ * (optional) allow text content to be set
+ * @param  {String} type - e.g. div/span/h1
+ * @param  {Object} attributes - e.g {class: 'small'}
+ * @param  {Object} textContent - e,g, 'Hello world'
+ * @return {Node} - Dom Node
+ */
+const elt = (type, attributes, textContent) => {
+  const _elt = document.createElement(type);
+  if (attributes) {
+    keys(attributes).forEach(key => {
+      _elt.setAttribute(key, attributes[key]);
+    });
+  }
+  if (textContent) {
+    _elt.textContent = textContent;
+  }
+  return _elt;
 };
 
-/** Main DOM Node **/
+/**
+ * Main DOM Node
+ */
 const GLOBAL_DOM_HOOK = document.getElementById('main');
 log('GLOBAL DOM HOOK: ', GLOBAL_DOM_HOOK);
 
-/** Msg constants **/
+/**
+ * Msg Constants (for update function)
+ */
 
 const SET_BASE_URL = 'SET_BASE_URL';
-const SET_SEARCH_TERM = 'SET_SEARCH_TERM';
-const CLEAR_SEARCH_TERM = 'CLEAR_SEARCH_TERM';
+const SET_SEARCH_QUERY = 'SET_SEARCH_QUERY';
+const CLEAR_SEARCH = 'CLEAR_SEARCH';
 const GET_DATA_REQUEST = 'GET_DATA_REQUEST';
 const GET_DATA_SUCCESS = 'GET_DATA_SUCCESS';
 const GET_DATA_FAILURE = 'GET_DATA_FAILURE';
 const SELECT_PATIENT = 'SELECT_PATIENT';
 const CLEAR_SELECTED_PATIENT = 'CLEAR_SELECTED_PATIENT';
-const SET_LOADING = 'SET_LOADING';
 const NO_OP = 'NO_OP';
 
-/** Model **/
-// flashMessages - null || { type: 'error'||'info', message: string }
-// data - null || object
-// searchTerm: string
-// baseUrl: string
-// selectedPatient: null || object
-// loading: boolean
-
-const initialModel = {
-  flashMessages: null ,
-  data: null,
-  searchTerm: '',
-  baseUrl: 'https://api.interview.healthforge.io:443/api/patient',
-  selectedPatient: null,
-  loading: false
+// Available input options
+const inputOptions = {
+  firstName: {
+    label: 'First Name',
+    value: ''
+  },
+  lastName: {
+    label: 'Last Name',
+    value: ''
+  },
+  zipCode: {
+    label: 'Zip Code',
+    value: ''
+  }
 };
 
-// Hold global model
-let GLOBAL_MODEL;
-
-/** View **/
+// Available sorting options
+const selectOptions = {
+  sort: {
+    value: '',
+    options: [
+      {
+        label: 'First Name (Ascending)',
+        value: 'firstName%20ASC'
+      },
+      {
+        label: 'First Name (Descending)',
+        value: 'firstName%20DESC'
+      },
+      {
+        label: 'Last Name (Ascending)',
+        value: 'lastName%20ASC'
+      },
+      {
+        label: 'Last Name (Descending)',
+        value: 'lastName%20DESC'
+      },
+      {
+        label: 'Date of Birth (Ascending)',
+        value: 'dateOfBirth%20ASC'
+      },
+      {
+        label: 'Date of Birth (Descending)',
+        value: 'dateOfBirth%20DESC'
+      },
+    ]
+  }
+};
 
 /**
- * _update (internal- called by main update)
- *
- * Takes msg object, (with msg type & payload)
- * Current model, returns array with new updates.
- *
- * @param  {Object} msg - containing type & payload
- * @param  {Object} model - current object
- * @return {Promise} - Return promise that always resolves
- * with array including;
- *
- * 0 - new msg (if any)
- * 1 - new model
+ * initialModel
  */
-const _update = (msg = {type: ""}, model) =>
-  new Promise((res) => {
 
-    // Toggle between message type
-    switch (msg.type) {
+const initialModel = {
+  flashMessages: null,
+  data: null,
+  searchQuery: {
+    inputs: inputOptions,
+    selects: selectOptions,
+    lastModified: 'firstName'
+  },
+  baseUrl: 'https://api.interview.healthforge.io:443/api/patient',
+  selectedPatient: null,
+};
 
-    case SET_BASE_URL: {
-      // Set base URL in model
-      res([null, combine(model, {baseUrl: msg.payload })]);
-      break;
-    }
-
-    case SET_SEARCH_TERM: {
-      // Set search term in model
-      res([{type: GET_DATA_REQUEST, payload: {url: `${model.baseUrl}?lastName=${msg.payload}`}}, combine(model, {searchTerm: msg.payload })]);
-      break;
-    }
-
-    case CLEAR_SEARCH_TERM: {
-      // Clear search term in model
-      res([{ type: GET_DATA_REQUEST, payload: { url: model.baseUrl }}, combine(model, {searchTerm: null })]);
-      break;
-    }
-
-    case SET_LOADING: {
-      // Set loading to true
-      res([null, combine(model, {loading: true })]);
-      break;
-    }
-
-    case GET_DATA_REQUEST: {
-      // Main getData call
-      getData(msg.payload)
-        .then(data => {
-          // Resolve
-          res([{ type: GET_DATA_SUCCESS, payload: data }, model]);
-        })
-        .catch(e => {
-          // Resolve
-          res([{ type: GET_DATA_FAILURE, payload: e }, model]);
-        });
-      break;
-    }
-    case GET_DATA_SUCCESS: {
-      // Set data key in model
-      res([null, combine(model, {data: msg.payload, loading: false })]);
-      break;
-    }
-    case GET_DATA_FAILURE: {
-      // Set flash message notifying user of failure
-      res([null, combine(model, {flashMessages: { type: 'error', message: msg.payload, loading: false }})]);
-      break;
-    }
-    case SELECT_PATIENT: {
-      // Set selectedPatient key
-      res([null, combine(model, {selectedPatient: msg.payload })]);
-      break;
-    }
-    case CLEAR_SELECTED_PATIENT: {
-      // Set selectedPatient key
-      res([null, combine(model, {selectedPatient: null })]);
-      break;
-    }
-    case NO_OP: {
-      // Default
-      res([null, model]);
-    }
-    }
-  });
+/**
+ * Hold global model
+ */
+let GLOBAL_MODEL = combine({}, initialModel);
 
 /**
  * getData
@@ -139,7 +145,6 @@ const _update = (msg = {type: ""}, model) =>
  *
  * url     - base url (String)
  * method  - (optional: defaults to get) get/post (String)
- *
  * payload - (optional: JSON payload) (String)
  *
  * @return {Promise} - return promise
@@ -162,45 +167,77 @@ const getData = (options) =>
       .catch(e => rej(e));
   });
 
+/**
+ * buildUrl
+ *
+ * Takes a base url, searchQuery object,
+ * and serialises options into query string
+ * to be appended to base url.
+ *
+ * @param  {String} baseUrl - initial URL
+ * @param  {Object} options - options object (searchQuery)
+ * @return {String} - final url
+ */
+const buildUrl = (baseUrl, options) => {
+  if (!options) return baseUrl;
+  // Create a flattened record
+  const flattened = {
+    firstName: options.inputs.firstName.value,
+    lastName: options.inputs.lastName.value,
+    zipCode: options.inputs.zipCode.value,
+    sort: options.selects.sort.value,
+  };
+
+  if (keys(flattened).some(x => flattened[x]) === false) {
+    log('USING BASE URL FOR QUERY', baseUrl);
+    return baseUrl;
+  }
+
+  const fullQuery = baseUrl + keys(flattened)
+    .reduce((acc,cur) => flattened[cur] ? `${acc}${cur}=${flattened[cur]}&` : acc, '?')
+    .replace(/&$/, '');
+  log('USING ENHANCED QUERY', fullQuery);
+  return fullQuery;
+};
+
 /** View **/
 
 const view = (model) => {
-  // View 1. For selected patient
-  if (model.selectedPatient) {
-    return selectedPatientView(model);
+  // View 1. For main view
+  if (!model.selectedPatient) {
+    return mainView(model);
   }
-  // View 2. For main app
+  // View 2. For selected patient
   else {
-    return mainTableView(model);
+    return selectedView(model);
   }
 };
 
 /**
- * mainTableView
+ * mainView
  *
- * Render view with all data (and search field)
+ * Render view with all data (and search fields)
  * @param  {Object} model
- * @return {String} - html string
+ * @return {Node} - main app
  */
-const mainTableView = (model) => {
+const mainView = (model) => {
 
   // Create Container
-  const main = classyElt('div', '');
+  const main = elt('div');
   // Build top search view
-  const searchView = classyElt('div', '');
-  searchView.appendChild(searchLabel());
-  searchView.appendChild(searchInput(model));
+  const searchView = elt('div');
+  searchView.appendChild(searchControls(model));
   searchView.appendChild(clearSearchButton());
   main.appendChild(searchView);
 
   // Do not continue if still loading
-  if (model.loading) {
+  if (!model.data) {
     main.appendChild(loadingSpinner());
     return main;
   }
 
   // Build table view
-  const tableView = classyElt('table', '');
+  const tableView = elt('table');
   // Build table html
   tableView.innerHTML = `
     <tr>
@@ -209,11 +246,27 @@ const mainTableView = (model) => {
       <th>Date of Birth</th>
     </tr>
     `;
-  patientRowsView(model).forEach(row => {
+  // Use each record to build a row
+  model.data.content.forEach(rec => {
+    // Initialise tr container
+    const row = elt('tr', {class: 'pointer'});
+    // Set data in each row
+    row.innerHTML = `
+      <td>${rec.lastName}</td>
+      <td>${rec.firstName}</td>
+      <td>${rec.dateOfBirth.split('T')[0]}</td>
+    `;
+    // Bind click to SELECT_PATIENT msg
+    row.addEventListener('click', () => {
+      log('SELECTED: ', rec.firstName, rec.lastName);
+      update({type: SELECT_PATIENT, payload: rec});
+    });
+    // Add each row
     tableView.appendChild(row);
   });
   // Combine
   main.appendChild(tableView);
+  // main.appendChild(pagination(model)); // @TODO: Add pagination
   return main;
 };
 
@@ -224,15 +277,19 @@ const mainTableView = (model) => {
  * @param  {Object} model
  * @return {String} - html string
  */
-const selectedPatientView = (model) => {
+const selectedView = (model) => {
   // Hold temp
   const s = model.selectedPatient;
   // Create Container
-  const main = classyElt('div', '');
+  const main = elt('div');
   // Set main html
   main.innerHTML = `
     <div>
       <table>
+        <tr>
+          <th>Prefix</th>
+          <td>${s.prefix}</td>
+        </tr>
         <tr>
           <th>First name</th>
           <td>${s.firstName}</td>
@@ -242,8 +299,28 @@ const selectedPatientView = (model) => {
           <td>${s.lastName}</td>
         </tr>
         <tr>
+          <th>Active?</th>
+          <td>${s.active ? 'true' : 'false'}</td>
+        </tr>
+        <tr>
           <th>DOB</th>
           <td>${s.dateOfBirth.split('T')[0]}</td>
+        </tr>
+        <tr>
+          <th>Address Line 1</th>
+          <td>${s.addresses[0].line1}</td>
+        </tr>
+        <tr>
+          <th>Country</th>
+          <td>${s.addresses[0].country}</td>
+        </tr>
+        <tr>
+          <th>Zip Code</th>
+          <td>${s.addresses[0].zipCode}</td>
+        </tr>
+        <tr>
+          <th>Phone</th>
+          <td>${s.telecoms[0].value}</td>
         </tr>
       </table>
     `;
@@ -252,41 +329,16 @@ const selectedPatientView = (model) => {
   return main;
 };
 
-/**
- * patientRowsView
- *
- * uses model data (if present)
- * to render table rows
- *
- * @param  {Object} model
- * @return {Nodes} - dom nodes
- */
-const patientRowsView = (model) =>
-  // Display loading spinner if loading
-  model.data.content.map(rec => {
-    const row = classyElt('tr', 'pointer');
-    row.innerHTML = `
-        <td>${rec.lastName}</td>
-        <td>${rec.firstName}</td>
-        <td>${rec.dateOfBirth.split('T')[0]}</td>
-      `;
-    row.addEventListener('click', () => {
-      log('SELECTED: ', rec.firstName, rec.lastName);
-      update({type: SELECT_PATIENT, payload: rec});
-    });
-    return row;
-  });
-
 /** View Components **/
 
 const loadingSpinner = () => {
-  const spinner = classyElt('span', '');
+  const spinner = elt('span');
   spinner.innerHTML = 'Loading';
   return spinner;
 };
 
 /**
- * clearButtonView
+ * clearSearchButton
  *
  * Render a 'clear' button component.
  * Allow event listener for click event
@@ -294,11 +346,11 @@ const loadingSpinner = () => {
  * @return {Node} - dom node
  */
 const clearSearchButton = () => {
-  const button = classyElt('button', '');
+  const button = elt('button');
   button.innerHTML = 'Clear';
   button.addEventListener('click', (e) => {
     e.preventDefault();
-    update({type: CLEAR_SEARCH_TERM});
+    update({type: CLEAR_SEARCH});
 
   });
   return button;
@@ -313,7 +365,7 @@ const clearSearchButton = () => {
  * @return {Node} - dom node
  */
 const clearPatientButton = () => {
-  const button = classyElt('button','');
+  const button = elt('button');
   button.innerHTML = 'Back';
   button.addEventListener('click', (e) => {
     e.preventDefault();
@@ -330,56 +382,196 @@ const clearPatientButton = () => {
  * to trigger set search term
  * @return {Node} - dom node
  */
-const searchInput = (model) => {
-  const input = classyElt('input', 'outline-0');
-  input.name = 'search';
-  input.id = 'search';
-  input.value = model.searchTerm;
-  input.addEventListener('keyup', (e) =>{
-    update({type: SET_SEARCH_TERM, payload: e.target.value});
-  });
-  // Add focus to the back of event queue
-  setTimeout(() => {
-    input.focus();
-  },0);
-  return input;
-};
 
-const searchLabel = () => {
-  const label = document.createElement('label');
-  label.setAttribute('for', 'search');
-  label.textContent = 'Search';
-  return label;
+const searchControls = (model) => {
+  const main = elt('div');
+
+  // 1. Extract inputs and build each
+  const { inputs } = model.searchQuery;
+  keys(inputs).forEach(field => {
+    // Define container
+    const inputContainer = elt('div');
+    const input = elt('input', {class: 'outline-0'});
+    input.name = field;
+    input.id = field;
+    input.value = inputs[field].value;
+    input.addEventListener('keyup', e => {
+      // Call update with updated searchQuery object
+      // Assign the corresponding input field the new value
+      // Update the lastModified key to indicate this is the
+      // latest control key that has been altered
+      update({type: SET_SEARCH_QUERY, payload: combine(model.searchQuery,
+        {
+          inputs: combine(inputs, {
+            [field]: {
+              value: e.target.value,
+              label: inputs[field].label
+            }
+          }),
+          lastModified: field
+        })
+      });
+    });
+    if (model.searchQuery.lastModified === field) {
+      // Initialise timeout to focus input
+      // Allow focus of input elemnt immediately after
+      // user has begun typing
+      setTimeout(() => {
+        input.focus();
+      },0);
+    }
+    // Add label & input
+    inputContainer.appendChild(elt('label', {name: field, for: field}, field));
+    inputContainer.appendChild(input);
+    main.appendChild(inputContainer);
+  });
+
+  // 2. Extract selects & build each
+  const { selects } = model.searchQuery;
+  keys(selects).forEach(field => {
+    const selectContainer = elt('div');
+    const select = elt('select', {class: 'outline-0'});
+    select.name = field;
+    selects[field].options.forEach(option => {
+      // Add options
+      // Set value to label option
+      select.appendChild(elt('option', selects[field].value === option.value ? { selected: true } : null, option.label));
+    });
+    // Add an empty element for removing query
+    select.appendChild(elt('option', selects[field].value ? null : { selected: true }, 'Choose an option...'));
+    select.addEventListener('change', e => {
+      // Call update with updated searchQuery object
+      // Assign the corresponding select field the new selected value
+      // Update the lastModified key to indicate this is the
+      // latest control key that has been altered
+      const valueFromLabel = selects[field].options.find(x => x.label === e.target.value);
+
+      if (!valueFromLabel) return;
+      update({type: SET_SEARCH_QUERY, payload: combine(model.searchQuery,
+        {
+          selects: {
+            [field]: {
+              value: valueFromLabel.value,
+              options: selects[field].options
+            }
+          },
+          lastModified: field
+        })
+      });
+    });
+    selectContainer.appendChild(elt('label', {name: field, for: field}, field));
+    selectContainer.appendChild(select);
+    main.appendChild(selectContainer);
+  });
+  return main;
 };
 
 /**
- * update
+ * _update (internal- called by main update)
  *
- * Main app
- * @param  {Object} - A msg object
- * @return {Promise} - returns Promise
+ * Takes msg object, (with msg type & payload)
+ * Calls internal function with global model.
+ * This sesolves with two-item array -
+ *
+ * 0 - new msg (if any)
+ * 1 - new model
+ *
+ * Which is then used to set GLOBAL_MODEL & render
+ * view.
+ *
+ * @param  {Object} msg - containing type & (optional) payload
+ * @return {Promise}
  */
-const update = (msg = {type: NO_OP}) =>
-  new Promise(res => {
-  // First begin update,
-  // use GLOBAL_MODEL
-    _update(msg, GLOBAL_MODEL)
+const update = (_msg = {type: NO_OP}) => {
+  /**
+   * Internal
+   */
+  const _update = (msg, model) =>
+    new Promise((res) => {
+
+      // Toggle between message type
+      switch (msg.type) {
+
+      case SET_BASE_URL: {
+        // Set base URL in model
+        res([null, combine(model, {baseUrl: msg.payload })]);
+        break;
+      }
+
+      case SET_SEARCH_QUERY: {
+        // Alter searchQuery object, then fire get request
+        res([{type: GET_DATA_REQUEST }, combine(model, {searchQuery: combine(model.searchQuery, msg.payload)})]);
+        break;
+      }
+
+      case CLEAR_SEARCH: {
+        // Reset searchQuery object, then fire get request
+        res([{ type: GET_DATA_REQUEST }, combine(model, {searchQuery: combine({}, initialModel.searchQuery) })]);
+        break;
+      }
+
+      case GET_DATA_REQUEST: {
+        // 1. Use build url to compose search query url
+        // & Attempt to retrieve data
+        getData({url: buildUrl(model.baseUrl, model.searchQuery)})
+          .then(data => {
+            // Resolve
+            res([{ type: GET_DATA_SUCCESS, payload: data }, model]);
+          })
+          .catch(e => {
+            // Resolve
+            res([{ type: GET_DATA_FAILURE, payload: e }, model]);
+          });
+        break;
+      }
+      case GET_DATA_SUCCESS: {
+        // Set data key in model
+        res([null, combine(model, {data: msg.payload})]);
+        break;
+      }
+      case GET_DATA_FAILURE: {
+        // Set flash message notifying user of failure
+        res([null, combine(model, {flashMessages: { type: 'error', message: msg.payload }})]);
+        break;
+      }
+      case SELECT_PATIENT: {
+        // Set selectedPatient key
+        res([null, combine(model, {selectedPatient: msg.payload })]);
+        break;
+      }
+      case CLEAR_SELECTED_PATIENT: {
+        // Set selectedPatient key
+        res([null, combine(model, {selectedPatient: null })]);
+        break;
+      }
+      case NO_OP: {
+        // Default
+        res([null, model]);
+      }
+      }
+    });
+
+  // Main return
+  return new Promise(res => {
+  // Fire update call
+    _update(_msg, GLOBAL_MODEL)
       .then(([newMsg, newModel]) => {
-        log('MSG PROCESSED: ', msg, 'NEWMODEL: ', newModel);
+        log('MSG PROCESSED: ', _msg, 'NEWMODEL: ', newModel);
         // UPDATE GLOBAL_MODEL
         GLOBAL_MODEL = newModel;
         // Apply new model to view
         render(view(newModel));
-        // If a message is return
-        // Re-call triggerUpdate
+        // If a message is returned
+        // Re-call update function
         if (newMsg) {
           update(newMsg);
         } else {
-          // Log msg & continue
+          // Resolve
           res();
         }
       });
   });
+};
 
 /**
  * render
@@ -387,29 +579,23 @@ const update = (msg = {type: NO_OP}) =>
  * Allow main dom element to be injected
  * with view
  *
- * @param {Node} elt - new node
+ * @param {Node} app - main app node
  */
-const render = (main) => {
+const render = (app) => {
   // Reset
   GLOBAL_DOM_HOOK.innerHTML = '';
   // Build
-  GLOBAL_DOM_HOOK.appendChild(main);
+  GLOBAL_DOM_HOOK.appendChild(app);
 };
 
 /**
  * init
  *
- * Call to initialise view
- * with initialModel
+ * Fire update to render app on page load
  */
 const init = () => {
-  GLOBAL_MODEL = initialModel;
-  // 1. Initially set loading
-  update({type: SET_LOADING})
-    .then(() => {
-    // 2. Make call to get data
-      update({type: GET_DATA_REQUEST, payload: { url: GLOBAL_MODEL.baseUrl}});
-    });
+  // Start by making request on page load
+  update({type: GET_DATA_REQUEST});
 };
 
 // Init app
