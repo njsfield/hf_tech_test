@@ -243,12 +243,13 @@ const selectedPatientView = (model) => {
         </tr>
         <tr>
           <th>DOB</th>
-          <td>${s.dateOfBirth}</td>
+          <td>${s.dateOfBirth.split('T')[0]}</td>
         </tr>
       </table>
     `;
   // Set child (back button)
   main.appendChild(clearPatientButton());
+  return main;
 };
 
 /**
@@ -263,14 +264,15 @@ const selectedPatientView = (model) => {
 const patientRowsView = (model) =>
   // Display loading spinner if loading
   model.data.content.map(rec => {
-    const row = classyElt('tr', '');
+    const row = classyElt('tr', 'pointer');
     row.innerHTML = `
         <td>${rec.lastName}</td>
         <td>${rec.firstName}</td>
         <td>${rec.dateOfBirth.split('T')[0]}</td>
       `;
     row.addEventListener('click', () => {
-      log('SELECTED: ', rec.firstName, ' '. res.lastName);
+      log('SELECTED: ', rec.firstName, rec.lastName);
+      update({type: SELECT_PATIENT, payload: rec});
     });
     return row;
   });
