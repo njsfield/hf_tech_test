@@ -50,7 +50,7 @@ const serve = (_path, res) => {
         _log('FILE WAS VIEW. COMPILING...');
         file = layoutFile.replace(injectionMarker, file);
       }
-      _log('SERVING TO CLIENT: ', _path);
+      _log(_log.obj('SERVING TO CLIENT: '), _path);
       res.writeHead(200);
       res.write(file);
       res.end();
@@ -84,7 +84,7 @@ const router = (req,res) => {
   if (staticRegex.test(uri)) {
     // Build full path
     const staticPath = `${STATIC_DIR}${uri}`;
-    _log('SERVING STATIC FILE: ', staticPath);
+    _log('PREPARING STATIC FILE: ', staticPath);
     serve(staticPath, res);
   } else {
     // Assert uri maps to allowed
@@ -92,13 +92,13 @@ const router = (req,res) => {
     if (routes[uri]) {
       // Build path
       const viewPath = `${VIEW_DIR}/${routes[uri]}`;
-      _log('SERVING VIEW: ', viewPath);
+      _log('PREPARING VIEW: ', viewPath);
       serve(viewPath, res);
     }
     else {
       const notFoundPath = `${VIEW_DIR}/404.html`;
       _log('NOT FOUND: ', uri);
-      _log('SERVING NOT FOUND: ', notFoundPath);
+      _log('PREPARING NOT FOUND VIEW: ', notFoundPath);
       serve(notFoundPath, res);
     }
   }
