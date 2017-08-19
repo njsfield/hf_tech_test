@@ -183,6 +183,7 @@ const view = (model) => {
  * @return {String} - html string
  */
 const mainTableView = (model) => {
+
   // Create Container
   const main = classyElt('div', '');
   // Build top search view
@@ -190,6 +191,13 @@ const mainTableView = (model) => {
   searchView.appendChild(searchLabel());
   searchView.appendChild(searchInput(model));
   searchView.appendChild(clearSearchButton());
+  main.appendChild(searchView);
+
+  // Do not continue if still loading
+  if (model.loading) {
+    main.appendChild(loadingSpinner());
+    return main;
+  }
 
   // Build table view
   const tableView = classyElt('table', '');
@@ -200,10 +208,11 @@ const mainTableView = (model) => {
       <th>First name</th>
       <th>Date of Birth</th>
     </tr>
-    ${patientRowsView(model)}
     `;
+  patientRowsView(model).forEach(row => {
+    tableView.appendChild(row);
+  });
   // Combine
-  main.appendChild(searchView);
   main.appendChild(tableView);
   return main;
 };
@@ -249,27 +258,30 @@ const selectedPatientView = (model) => {
  * to render table rows
  *
  * @param  {Object} model
- * @return {String} - html string
+ * @return {Nodes} - dom nodes
  */
 const patientRowsView = (model) =>
   // Display loading spinner if loading
-  model.loading ?
-    `
-    <span>Loading...</span>
-    `
-    :
-    model.data.content.map(rec =>
-      `
-    <tr>
-      <td>${rec.lastName}</td>
-      <td>${rec.firstName}</td>
-      <td>${rec.dateOfBirth.split('T')[0]}</td>
-    </tr>
-    `
-    ).join("")
-  ;
+  model.data.content.map(rec => {
+    const row = classyElt('tr', '');
+    row.innerHTML = `
+        <td>${rec.lastName}</td>
+        <td>${rec.firstName}</td>
+        <td>${rec.dateOfBirth.split('T')[0]}</td>
+      `;
+    row.addEventListener('click', () => {
+      log('SELECTED: ', rec.firstName, ' '. res.lastName);
+    });
+    return row;
+  });
 
 /** View Components **/
+
+const loadingSpinner = () => {
+  const spinner = classyElt('span', '');
+  spinner.innerHTML = 'Loading';
+  return spinner;
+};
 
 /**
  * clearButtonView
