@@ -17,7 +17,7 @@ const initialModel = {
     lastModified: 'firstName',
     page: 0
   },
-  baseUrl: 'https://api.interview.healthforge.io:443/api/patient',
+  baseUrl: 'https://api.interview.healthforge.io:443/api/secure/patient',
   selectedPatient: null
 };
 

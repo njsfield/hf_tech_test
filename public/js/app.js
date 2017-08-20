@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 3);
+/******/ 	return __webpack_require__(__webpack_require__.s = 4);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -175,7 +175,7 @@ exports.getJson = function (options) {
     fetch(options.url, {
       method: 'get',
       mode: 'cors',
-      headers: {
+      headers: options.headers || {
         Accept: 'application/json'
       }
     }).then(function (response) {
@@ -212,10 +212,10 @@ exports.hasTruthyValues = function (obj) {
 var _require = __webpack_require__(0),
     combine = _require.combine;
 
-var flattenSearchFilters = __webpack_require__(4);
-var constants = __webpack_require__(5);
-var inputOptions = __webpack_require__(6);
-var selectOptions = __webpack_require__(7);
+var flattenSearchFilters = __webpack_require__(5);
+var constants = __webpack_require__(6);
+var inputOptions = __webpack_require__(7);
+var selectOptions = __webpack_require__(8);
 
 /**
  * initialModel
@@ -229,7 +229,7 @@ var initialModel = {
     lastModified: 'firstName',
     page: 0
   },
-  baseUrl: 'https://api.interview.healthforge.io:443/api/patient',
+  baseUrl: 'https://api.interview.healthforge.io:443/api/secure/patient',
   selectedPatient: null
 };
 
@@ -273,6 +273,22 @@ module.exports = {
 "use strict";
 
 
+module.exports = {
+  viewContainer: 'w-100 vh-100 bg-blue pv5 pa4-ns ph6-l pv7-l pa2 dib',
+  table: 'w-100 mw6 collapse',
+  tableHead: 'tl sans-serif moon-gray fw5',
+  tableRow: '',
+  tableCell: 'tl sans-serif white fw2',
+  clearPatientButton: 'bg-white black bn w4 pointer pa3 br2 mv4'
+};
+
+/***/ }),
+/* 4 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
 var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
 
 var _require = __webpack_require__(0),
@@ -289,9 +305,9 @@ var _require2 = __webpack_require__(1),
 // Main update
 
 
-var update = __webpack_require__(8);
+var update = __webpack_require__(9);
 // Main view
-var view = __webpack_require__(10);
+var view = __webpack_require__(11);
 
 // Initialise view log
 
@@ -375,11 +391,11 @@ var init = function init() {
   mainUpdate({ type: GET_DATA_REQUEST });
 };
 
-// Initialise
-init();
+// Allow init method on window object
+window.app = { init: init };
 
 /***/ }),
-/* 4 */
+/* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -404,7 +420,7 @@ module.exports = function (searchFilters) {
 };
 
 /***/ }),
-/* 5 */
+/* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -426,7 +442,7 @@ exports.CLEAR_SELECTED_PATIENT = 'CLEAR_SELECTED_PATIENT';
 exports.NO_OP = 'NO_OP';
 
 /***/ }),
-/* 6 */
+/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -452,7 +468,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 7 */
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -489,7 +505,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 8 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -505,14 +521,12 @@ var _require = __webpack_require__(1),
     SELECT_PATIENT = _require.SELECT_PATIENT,
     CLEAR_SELECTED_PATIENT = _require.CLEAR_SELECTED_PATIENT,
     NO_OP = _require.NO_OP,
-    flattenSearchFilters = _require.flattenSearchFilters,
     initialModel = _require.initialModel;
 
-var buildUrl = __webpack_require__(9);
+var getData = __webpack_require__(10);
 
 var _require2 = __webpack_require__(0),
-    combine = _require2.combine,
-    getJson = _require2.getJson;
+    combine = _require2.combine;
 
 /**
  * update
@@ -562,11 +576,9 @@ module.exports = function () {
 
       case GET_DATA_REQUEST:
         {
-          // 1. Use build url to compose search query url
-          // & Attempt to retrieve data
-          getJson({
-            url: buildUrl(model.baseUrl, flattenSearchFilters(model.searchFilters))
-          }).then(function (data) {
+          // Fire request using current data in model
+          // & secure token (see getData)
+          getData(model).then(function (data) {
             // Resolve
             res([{ type: GET_DATA_SUCCESS, payload: data }, model]);
           }).catch(function (e) {
@@ -611,7 +623,7 @@ module.exports = function () {
 };
 
 /***/ }),
-/* 9 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -619,15 +631,31 @@ module.exports = function () {
 
 var _require = __webpack_require__(0),
     keys = _require.keys,
-    hasTruthyValues = _require.hasTruthyValues;
+    hasTruthyValues = _require.hasTruthyValues,
+    getJson = _require.getJson;
+
+var _require2 = __webpack_require__(1),
+    flattenSearchFilters = _require2.flattenSearchFilters;
 
 // Initialise log when url built
 
 
-var _require2 = __webpack_require__(0),
-    log = _require2.log;
+var _require3 = __webpack_require__(0),
+    log = _require3.log;
 
-log = log('BUILD URL');
+log = log('GET_DATA');
+
+/**
+ * secure headers
+ *
+ * Return secure headers via keycloak token
+ */
+var secureHeaders = function secureHeaders() {
+  return {
+    Accept: 'application/json',
+    Authorization: 'Bearer ' + window.keycloak.token
+  };
+};
 /**
  * buildUrl
  *
@@ -638,7 +666,7 @@ log = log('BUILD URL');
  * @param  {Object} options - options
  * @return {String} - final url
  */
-module.exports = function (baseUrl, params) {
+var buildUrl = function buildUrl(baseUrl, params) {
   // If no params or all param values are empty
   // Return base url
   if (!params || hasTruthyValues(params) === false) {
@@ -654,15 +682,33 @@ module.exports = function (baseUrl, params) {
   return fullUrl;
 };
 
+/**
+ * getData
+ *
+ * Build request from base url in
+ * model, searchFilter params
+ * and fire fetch request
+ * @param  {Object} model
+ * @return {Promise}
+ */
+module.exports = function (model) {
+  // Initialise url
+  var url = buildUrl(model.baseUrl, flattenSearchFilters(model.searchFilters));
+  // Initialise headers
+  var headers = secureHeaders();
+  // Return promise
+  return getJson({ url: url, headers: headers });
+};
+
 /***/ }),
-/* 10 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var fullView = __webpack_require__(11);
-var selectedView = __webpack_require__(18);
+var fullView = __webpack_require__(12);
+var selectedView = __webpack_require__(19);
 
 /**
  * view
@@ -686,7 +732,7 @@ module.exports = function (model, update) {
 };
 
 /***/ }),
-/* 11 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -695,11 +741,11 @@ module.exports = function (model, update) {
 var _require = __webpack_require__(0),
     elt = _require.elt;
 
-var header = __webpack_require__(12);
-var searchPanel = __webpack_require__(13);
-var loading = __webpack_require__(15);
-var patientTable = __webpack_require__(16);
-var pagination = __webpack_require__(17);
+var header = __webpack_require__(13);
+var searchPanel = __webpack_require__(14);
+var loading = __webpack_require__(16);
+var patientTable = __webpack_require__(17);
+var pagination = __webpack_require__(18);
 
 var styles = __webpack_require__(2);
 /**
@@ -732,7 +778,7 @@ module.exports = function (model, update) {
 };
 
 /***/ }),
-/* 12 */
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -761,7 +807,7 @@ module.exports = function () {
 };
 
 /***/ }),
-/* 13 */
+/* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -777,7 +823,7 @@ var _require = __webpack_require__(0),
 var _require2 = __webpack_require__(1),
     SET_SEARCH_QUERY = _require2.SET_SEARCH_QUERY;
 
-var clearSearchButton = __webpack_require__(14);
+var clearSearchButton = __webpack_require__(15);
 
 var styles = __webpack_require__(2);
 
@@ -886,7 +932,7 @@ module.exports = function (model, update) {
 };
 
 /***/ }),
-/* 14 */
+/* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -922,7 +968,7 @@ module.exports = function (update) {
 };
 
 /***/ }),
-/* 15 */
+/* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -945,7 +991,7 @@ module.exports = function () {
 };
 
 /***/ }),
-/* 16 */
+/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1000,7 +1046,7 @@ module.exports = function (model, update) {
 };
 
 /***/ }),
-/* 17 */
+/* 18 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1055,7 +1101,7 @@ module.exports = function (model, update) {
 };
 
 /***/ }),
-/* 18 */
+/* 19 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1064,10 +1110,10 @@ module.exports = function (model, update) {
 var _require = __webpack_require__(0),
     elt = _require.elt;
 
-var selectedTable = __webpack_require__(19);
-var clearPatientButton = __webpack_require__(20);
+var selectedTable = __webpack_require__(20);
+var clearPatientButton = __webpack_require__(21);
 
-var styles = __webpack_require__(21);
+var styles = __webpack_require__(3);
 
 /**
  * selectedView
@@ -1086,7 +1132,7 @@ module.exports = function (model, update) {
 };
 
 /***/ }),
-/* 19 */
+/* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1095,7 +1141,7 @@ module.exports = function (model, update) {
 var _require = __webpack_require__(0),
     elt = _require.elt;
 
-var styles = __webpack_require__(21);
+var styles = __webpack_require__(3);
 
 /**
  * selectedTable
@@ -1147,7 +1193,7 @@ module.exports = function (model) {
 };
 
 /***/ }),
-/* 20 */
+/* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1159,7 +1205,7 @@ var _require = __webpack_require__(0),
 var _require2 = __webpack_require__(1),
     CLEAR_SELECTED_PATIENT = _require2.CLEAR_SELECTED_PATIENT;
 
-var styles = __webpack_require__(21);
+var styles = __webpack_require__(3);
 /**
  * clearButtonView
  *
@@ -1178,22 +1224,6 @@ module.exports = function (update) {
     update({ type: CLEAR_SELECTED_PATIENT });
   });
   return button;
-};
-
-/***/ }),
-/* 21 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-module.exports = {
-  viewContainer: 'w-100 vh-100 bg-blue pv5 pa4-ns ph6-l pv7-l pa2 dib',
-  table: 'w-100 mw6 collapse',
-  tableHead: 'tl sans-serif moon-gray fw5',
-  tableRow: '',
-  tableCell: 'tl sans-serif white fw2',
-  clearPatientButton: 'bg-white black bn w4 pointer pa3 br2 mv4'
 };
 
 /***/ })

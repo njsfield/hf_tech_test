@@ -8,13 +8,12 @@ const {
   SELECT_PATIENT,
   CLEAR_SELECTED_PATIENT,
   NO_OP,
-  flattenSearchFilters,
   initialModel
 } = require('../model');
 
-const buildUrl = require('./build_url');
+const getData = require('./get_data');
 
-const { combine, getJson } = require('../../../utils');
+const { combine } = require('../../../utils');
 
 /**
  * update
@@ -62,14 +61,9 @@ module.exports = (msg = { type: NO_OP }, model) =>
       }
 
       case GET_DATA_REQUEST: {
-        // 1. Use build url to compose search query url
-        // & Attempt to retrieve data
-        getJson({
-          url: buildUrl(
-            model.baseUrl,
-            flattenSearchFilters(model.searchFilters)
-          )
-        })
+        // Fire request using current data in model
+        // & secure token (see getData)
+        getData(model)
           .then(data => {
             // Resolve
             res([{ type: GET_DATA_SUCCESS, payload: data }, model]);

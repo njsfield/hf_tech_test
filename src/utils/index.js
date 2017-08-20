@@ -86,7 +86,7 @@ exports.getJson = options =>
     fetch(options.url, {
       method: 'get',
       mode: 'cors',
-      headers: {
+      headers: options.headers || {
         Accept: 'application/json'
       }
     })

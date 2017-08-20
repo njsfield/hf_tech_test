@@ -81,5 +81,5 @@ const init = () => {
   mainUpdate({ type: GET_DATA_REQUEST });
 };
 
-// Initialise
-init();
+// Allow init method on window object
+window.app = { init };
