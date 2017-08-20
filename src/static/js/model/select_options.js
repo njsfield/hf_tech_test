@@ -5,6 +5,7 @@
 module.exports = {
   sort: {
     value: '',
+    label: 'Sort',
     options: [
       {
         label: 'First Name (Ascending)',

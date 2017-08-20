@@ -18,7 +18,7 @@ const styles = require('./styles');
  */
 module.exports = (model, update) => {
   // Assign container
-  const main = elt('div', { class: styles.main });
+  const main = elt('div', { class: styles.viewContainer });
   // Add header
   main.appendChild(header());
   // Add search panel

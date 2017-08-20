@@ -1,6 +1,8 @@
 const { elt, countArr, combine } = require('../../../../utils');
 const { SET_SEARCH_QUERY } = require('../../model');
 
+const styles = require('./styles');
+
 /**
  * pagination
  *
@@ -14,8 +16,8 @@ module.exports = (model, update) => {
   // Extract total pages
   const { totalPages, number } = model.data;
 
-  const selectContainer = elt('div');
-  const select = elt('select', { class: 'outline-0' });
+  const selectContainer = elt('div', { class: styles.paginationContainer });
+  const select = elt('select', { class: styles.paginationSelect });
   countArr(totalPages).forEach(num => {
     // Add options
     // Set selected if num equal to number in model
@@ -31,7 +33,9 @@ module.exports = (model, update) => {
     });
   });
   // Add a label
-  selectContainer.appendChild(elt('label', null, 'Page'));
+  selectContainer.appendChild(
+    elt('label', { class: styles.paginationLabel }, 'Page: ')
+  );
   selectContainer.appendChild(select);
   // Render
   main.appendChild(selectContainer);

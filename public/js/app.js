@@ -437,6 +437,7 @@ module.exports = {
 module.exports = {
   sort: {
     value: '',
+    label: 'Sort',
     options: [{
       label: 'First Name (Ascending)',
       value: 'firstName%20ASC'
@@ -684,7 +685,7 @@ var styles = __webpack_require__(17);
  */
 module.exports = function (model, update) {
   // Assign container
-  var main = elt('div', { class: styles.main });
+  var main = elt('div', { class: styles.viewContainer });
   // Add header
   main.appendChild(header());
   // Add search panel
@@ -711,6 +712,8 @@ module.exports = function (model, update) {
 
 var _require = __webpack_require__(0),
     elt = _require.elt;
+
+var styles = __webpack_require__(17);
 /**
  * Header
  *
@@ -718,14 +721,12 @@ var _require = __webpack_require__(0),
  * Composed of title & sub element
  * @return {Node}
  */
-
-
 module.exports = function () {
   var main = elt('div');
   var titleText = 'Patient Lookup';
-  var subText = 'Please use the search fields to look up patient records. Click on a patient to see more info';
-  var title = elt('h1', null, titleText);
-  var sub = elt('h2', null, subText);
+  var subText = 'Please use the search fields to look up patient records. Click on a patient field to see more info';
+  var title = elt('h1', { class: styles.title }, titleText);
+  var sub = elt('h2', { class: styles.sub }, subText);
   main.appendChild(title);
   main.appendChild(sub);
   return main;
@@ -750,6 +751,8 @@ var _require2 = __webpack_require__(1),
 
 var clearSearchButton = __webpack_require__(13);
 
+var styles = __webpack_require__(17);
+
 /**
  * searchPanel
  *
@@ -762,15 +765,15 @@ var clearSearchButton = __webpack_require__(13);
  */
 
 module.exports = function (model, update) {
-  var main = elt('div');
+  var main = elt('div', { class: styles.searchPanelContainer });
 
   // 1. Extract inputs and build each
   var inputs = model.searchFilters.inputs;
 
   keys(inputs).forEach(function (field) {
     // Define container
-    var inputContainer = elt('div');
-    var input = elt('input', { class: 'outline-0' });
+    var inputContainer = elt('div', { class: styles.inputContainer });
+    var input = elt('input', { class: styles.input });
     input.name = field;
     input.id = field;
     input.value = inputs[field].value;
@@ -800,7 +803,7 @@ module.exports = function (model, update) {
       }, 0);
     }
     // Add label & input
-    inputContainer.appendChild(elt('label', { name: field, for: field }, inputs[field].label));
+    inputContainer.appendChild(elt('label', { name: field, for: field, class: styles.inputLabel }, inputs[field].label + ':'));
     inputContainer.appendChild(input);
     main.appendChild(inputContainer);
   });
@@ -810,7 +813,7 @@ module.exports = function (model, update) {
 
   keys(selects).forEach(function (field) {
     var selectContainer = elt('div');
-    var select = elt('select', { class: 'outline-0' });
+    var select = elt('select', { class: styles.select });
     select.name = field;
     selects[field].options.forEach(function (option) {
       // Add options
@@ -835,6 +838,7 @@ module.exports = function (model, update) {
         payload: combine(model.searchFilters, {
           selects: _defineProperty({}, field, {
             value: valueFromLabel.value,
+            label: selects[field].label,
             options: selects[field].options
           }),
           lastModified: field,
@@ -843,7 +847,7 @@ module.exports = function (model, update) {
       });
     });
     // Add additional label
-    selectContainer.appendChild(elt('label', { name: field, for: field }, field));
+    selectContainer.appendChild(elt('label', { name: field, for: field, class: styles.selectLabel }, selects[field].label + ':'));
     selectContainer.appendChild(select);
     // Render
     main.appendChild(selectContainer);
@@ -865,6 +869,8 @@ var _require = __webpack_require__(0),
 
 var _require2 = __webpack_require__(1),
     CLEAR_SEARCH = _require2.CLEAR_SEARCH;
+
+var styles = __webpack_require__(17);
 /**
  * clearSearchButton
  *
@@ -874,15 +880,17 @@ var _require2 = __webpack_require__(1),
  * @param  {Function} update - main update function
  * @return {Node} - dom node
  */
-
-
 module.exports = function (update) {
-  var button = elt('button', null, 'Clear');
+  var buttonContainer = elt('div', {
+    class: styles.clearSearchButtonContainer
+  });
+  var button = elt('button', { class: styles.clearSearchButton }, 'Clear');
   button.addEventListener('click', function (e) {
     e.preventDefault();
     update({ type: CLEAR_SEARCH });
   });
-  return button;
+  buttonContainer.appendChild(button);
+  return buttonContainer;
 };
 
 /***/ }),
@@ -929,6 +937,8 @@ var _require3 = __webpack_require__(0),
 
 log = log('PATIENT TABLE');
 
+var styles = __webpack_require__(17);
+
 /**
  * patientTable
  *
@@ -941,15 +951,15 @@ log = log('PATIENT TABLE');
  */
 module.exports = function (model, update) {
   // Build table view
-  var table = elt('table');
+  var table = elt('table', { class: styles.table });
   // Build head html
-  table.innerHTML = '\n    <tr>\n      <th>Last name</th>\n      <th>First name</th>\n      <th>Date of Birth</th>\n    </tr>\n    ';
+  table.innerHTML = '\n    <tr class="ba">\n      <th class="' + styles.tableHead + '">Last name</th>\n      <th class="' + styles.tableHead + '">First name</th>\n      <th class="' + styles.tableHead + '">Date of Birth</th>\n    </tr>\n    ';
   // Use each record to build a row
   model.data.content.forEach(function (rec) {
     // Initialise tr container
-    var row = elt('tr', { class: 'pointer' });
+    var row = elt('tr', { class: styles.tableRow });
     // Set data in each row
-    row.innerHTML = '\n      <td>' + rec.lastName + '</td>\n      <td>' + rec.firstName + '</td>\n      <td>' + rec.dateOfBirth.split('T')[0] + '</td>\n    ';
+    row.innerHTML = '\n      <td class="' + styles.tableCell + '">' + rec.lastName + '</td>\n      <td class="' + styles.tableCell + '">' + rec.firstName + '</td>\n      <td class="' + styles.tableCell + '">' + rec.dateOfBirth.split('T')[0] + '</td>\n    ';
     // Bind click to SELECT_PATIENT msg
     row.addEventListener('click', function () {
       log('SELECTED: ', rec.firstName, rec.lastName);
@@ -976,6 +986,8 @@ var _require = __webpack_require__(0),
 var _require2 = __webpack_require__(1),
     SET_SEARCH_QUERY = _require2.SET_SEARCH_QUERY;
 
+var styles = __webpack_require__(17);
+
 /**
  * pagination
  *
@@ -984,8 +996,6 @@ var _require2 = __webpack_require__(1),
  * @param  {Function} update - main update function
  * @return {Node}  - dom node
  */
-
-
 module.exports = function (model, update) {
   var main = elt('div');
   // Extract total pages
@@ -994,8 +1004,8 @@ module.exports = function (model, update) {
       number = _model$data.number;
 
 
-  var selectContainer = elt('div');
-  var select = elt('select', { class: 'outline-0' });
+  var selectContainer = elt('div', { class: styles.paginationContainer });
+  var select = elt('select', { class: styles.paginationSelect });
   countArr(totalPages).forEach(function (num) {
     // Add options
     // Set selected if num equal to number in model
@@ -1009,7 +1019,7 @@ module.exports = function (model, update) {
     });
   });
   // Add a label
-  selectContainer.appendChild(elt('label', null, 'Page'));
+  selectContainer.appendChild(elt('label', { class: styles.paginationLabel }, 'Page: '));
   selectContainer.appendChild(select);
   // Render
   main.appendChild(selectContainer);
@@ -1024,7 +1034,24 @@ module.exports = function (model, update) {
 
 
 module.exports = {
-  main: ''
+  viewContainer: 'w-100 ba bw3 ma0 mt5-ns pa4-ns pa2 dib',
+  title: 'sans-serif f2',
+  sub: 'sans-serif f4 fw3',
+  searchPanelContainer: 'ba b--silver bl-0 br-0 pv2 flex-l flex-xl items-center-l justify-between',
+  inputContainer: 'flex-l flex-xl items-center-l',
+  input: 'w-100 w-50-l outline-0 bg-light-gray pa0 border-box blue',
+  inputLabel: 'sans-serif pa2-l pl0-l fw6',
+  select: 'w-100 w-auto-l outline-0 pa2 bg-light-gray blue',
+  selectLabel: 'sans-serif pa2-l pl0-l fw6',
+  clearSearchButtonContainer: 'w-100 w4-l mv2 ma2-l mr0-l pointer flex justify-end',
+  clearSearchButton: 'bg-black white bn w-100 pointer pa1 br2',
+  table: 'w-100 collapse ba b--silver',
+  tableHead: 'tl bb b--light-gray sans-serif bg-blue white pa2',
+  tableRow: 'bb sans-serif fw3 pointer stripe-light',
+  tableCell: 'ph2 pv1',
+  paginationContainer: 'pv2 flex items-center justify-end',
+  paginationSelect: 'san-serif pr2',
+  paginationLabel: 'san-serif pr1 outline-0'
 };
 
 /***/ }),

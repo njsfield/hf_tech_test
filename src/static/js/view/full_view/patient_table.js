@@ -5,6 +5,8 @@ const { SELECT_PATIENT } = require('../../model');
 let { log } = require('../../../../utils');
 log = log('PATIENT TABLE');
 
+const styles = require('./styles');
+
 /**
  * patientTable
  *
@@ -17,24 +19,24 @@ log = log('PATIENT TABLE');
  */
 module.exports = (model, update) => {
   // Build table view
-  const table = elt('table');
+  const table = elt('table', { class: styles.table });
   // Build head html
   table.innerHTML = `
-    <tr>
-      <th>Last name</th>
-      <th>First name</th>
-      <th>Date of Birth</th>
+    <tr class="ba">
+      <th class="${styles.tableHead}">Last name</th>
+      <th class="${styles.tableHead}">First name</th>
+      <th class="${styles.tableHead}">Date of Birth</th>
     </tr>
     `;
   // Use each record to build a row
   model.data.content.forEach(rec => {
     // Initialise tr container
-    const row = elt('tr', { class: 'pointer' });
+    const row = elt('tr', { class: styles.tableRow });
     // Set data in each row
     row.innerHTML = `
-      <td>${rec.lastName}</td>
-      <td>${rec.firstName}</td>
-      <td>${rec.dateOfBirth.split('T')[0]}</td>
+      <td class="${styles.tableCell}">${rec.lastName}</td>
+      <td class="${styles.tableCell}">${rec.firstName}</td>
+      <td class="${styles.tableCell}">${rec.dateOfBirth.split('T')[0]}</td>
     `;
     // Bind click to SELECT_PATIENT msg
     row.addEventListener('click', () => {

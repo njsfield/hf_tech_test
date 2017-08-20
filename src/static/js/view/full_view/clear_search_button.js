@@ -1,5 +1,7 @@
 const { elt } = require('../../../../utils');
 const { CLEAR_SEARCH } = require('../../model');
+
+const styles = require('./styles');
 /**
  * clearSearchButton
  *
@@ -10,10 +12,14 @@ const { CLEAR_SEARCH } = require('../../model');
  * @return {Node} - dom node
  */
 module.exports = update => {
-  const button = elt('button', null, 'Clear');
+  const buttonContainer = elt('div', {
+    class: styles.clearSearchButtonContainer
+  });
+  const button = elt('button', { class: styles.clearSearchButton }, 'Clear');
   button.addEventListener('click', e => {
     e.preventDefault();
     update({ type: CLEAR_SEARCH });
   });
-  return button;
+  buttonContainer.appendChild(button);
+  return buttonContainer;
 };

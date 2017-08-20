@@ -3,6 +3,8 @@ const { SET_SEARCH_QUERY } = require('../../model');
 
 const clearSearchButton = require('./clear_search_button');
 
+const styles = require('./styles');
+
 /**
  * searchPanel
  *
@@ -15,14 +17,14 @@ const clearSearchButton = require('./clear_search_button');
  */
 
 module.exports = (model, update) => {
-  const main = elt('div');
+  const main = elt('div', { class: styles.searchPanelContainer });
 
   // 1. Extract inputs and build each
   const { inputs } = model.searchFilters;
   keys(inputs).forEach(field => {
     // Define container
-    const inputContainer = elt('div');
-    const input = elt('input', { class: 'outline-0' });
+    const inputContainer = elt('div', { class: styles.inputContainer });
+    const input = elt('input', { class: styles.input });
     input.name = field;
     input.id = field;
     input.value = inputs[field].value;
@@ -55,7 +57,11 @@ module.exports = (model, update) => {
     }
     // Add label & input
     inputContainer.appendChild(
-      elt('label', { name: field, for: field }, inputs[field].label)
+      elt(
+        'label',
+        { name: field, for: field, class: styles.inputLabel },
+        inputs[field].label + ':'
+      )
     );
     inputContainer.appendChild(input);
     main.appendChild(inputContainer);
@@ -65,7 +71,7 @@ module.exports = (model, update) => {
   const { selects } = model.searchFilters;
   keys(selects).forEach(field => {
     const selectContainer = elt('div');
-    const select = elt('select', { class: 'outline-0' });
+    const select = elt('select', { class: styles.select });
     select.name = field;
     selects[field].options.forEach(option => {
       // Add options
@@ -103,6 +109,7 @@ module.exports = (model, update) => {
           selects: {
             [field]: {
               value: valueFromLabel.value,
+              label: selects[field].label,
               options: selects[field].options
             }
           },
@@ -113,7 +120,11 @@ module.exports = (model, update) => {
     });
     // Add additional label
     selectContainer.appendChild(
-      elt('label', { name: field, for: field }, field)
+      elt(
+        'label',
+        { name: field, for: field, class: styles.selectLabel },
+        selects[field].label + ':'
+      )
     );
     selectContainer.appendChild(select);
     // Render
