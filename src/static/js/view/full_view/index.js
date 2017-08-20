@@ -1,5 +1,6 @@
 const { elt } = require('../../../../utils');
 
+const header = require('./header');
 const searchPanel = require('./search_panel');
 const loading = require('./loading');
 const patientTable = require('./patient_table');
@@ -9,7 +10,7 @@ const styles = require('./styles');
 /**
  * fullView
  *
- * Render search controls, table view & pagination
+ * Render header, search controls, table view & pagination
  * controls
  * @param  {Object} model
  * @param  {Function} update - main update function
@@ -18,6 +19,9 @@ const styles = require('./styles');
 module.exports = (model, update) => {
   // Assign container
   const main = elt('div', { class: styles.main });
+  // Add header
+  main.appendChild(header());
+  // Add search panel
   main.appendChild(searchPanel(model, update));
 
   // Do not continue if data still loading!

@@ -214,8 +214,8 @@ var _require = __webpack_require__(0),
 
 var flattenSearchFilters = __webpack_require__(3);
 var constants = __webpack_require__(4);
-var inputOptions = __webpack_require__(19);
-var selectOptions = __webpack_require__(20);
+var inputOptions = __webpack_require__(5);
+var selectOptions = __webpack_require__(6);
 
 /**
  * initialModel
@@ -261,9 +261,9 @@ var _require2 = __webpack_require__(1),
 // Main update
 
 
-var update = __webpack_require__(5);
+var update = __webpack_require__(7);
 // Main view
-var view = __webpack_require__(7);
+var view = __webpack_require__(9);
 
 // Initialise view log
 
@@ -404,6 +404,68 @@ exports.NO_OP = 'NO_OP';
 "use strict";
 
 
+/**
+ * inputOptions
+ * @type {Object}
+ */
+module.exports = {
+  firstName: {
+    label: 'First Name',
+    value: ''
+  },
+  lastName: {
+    label: 'Last Name',
+    value: ''
+  },
+  zipCode: {
+    label: 'Zip Code',
+    value: ''
+  }
+};
+
+/***/ }),
+/* 6 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+/**
+ * selectOptions
+ * @type {Object}
+ */
+module.exports = {
+  sort: {
+    value: '',
+    options: [{
+      label: 'First Name (Ascending)',
+      value: 'firstName%20ASC'
+    }, {
+      label: 'First Name (Descending)',
+      value: 'firstName%20DESC'
+    }, {
+      label: 'Last Name (Ascending)',
+      value: 'lastName%20ASC'
+    }, {
+      label: 'Last Name (Descending)',
+      value: 'lastName%20DESC'
+    }, {
+      label: 'Date of Birth (Ascending)',
+      value: 'dateOfBirth%20ASC'
+    }, {
+      label: 'Date of Birth (Descending)',
+      value: 'dateOfBirth%20DESC'
+    }]
+  }
+};
+
+/***/ }),
+/* 7 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
 var _require = __webpack_require__(1),
     SET_BASE_URL = _require.SET_BASE_URL,
     SET_SEARCH_QUERY = _require.SET_SEARCH_QUERY,
@@ -417,7 +479,7 @@ var _require = __webpack_require__(1),
     flattenSearchFilters = _require.flattenSearchFilters,
     initialModel = _require.initialModel;
 
-var buildUrl = __webpack_require__(6);
+var buildUrl = __webpack_require__(8);
 
 var _require2 = __webpack_require__(0),
     combine = _require2.combine,
@@ -520,7 +582,7 @@ module.exports = function () {
 };
 
 /***/ }),
-/* 6 */
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -564,14 +626,14 @@ module.exports = function (baseUrl, params) {
 };
 
 /***/ }),
-/* 7 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var fullView = __webpack_require__(8);
-var selectedView = __webpack_require__(15);
+var fullView = __webpack_require__(10);
+var selectedView = __webpack_require__(18);
 
 /**
  * view
@@ -595,7 +657,7 @@ module.exports = function (model, update) {
 };
 
 /***/ }),
-/* 8 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -604,16 +666,17 @@ module.exports = function (model, update) {
 var _require = __webpack_require__(0),
     elt = _require.elt;
 
-var searchPanel = __webpack_require__(9);
-var loading = __webpack_require__(11);
-var patientTable = __webpack_require__(12);
-var pagination = __webpack_require__(13);
+var header = __webpack_require__(11);
+var searchPanel = __webpack_require__(12);
+var loading = __webpack_require__(14);
+var patientTable = __webpack_require__(15);
+var pagination = __webpack_require__(16);
 
-var styles = __webpack_require__(14);
+var styles = __webpack_require__(17);
 /**
  * fullView
  *
- * Render search controls, table view & pagination
+ * Render header, search controls, table view & pagination
  * controls
  * @param  {Object} model
  * @param  {Function} update - main update function
@@ -622,6 +685,9 @@ var styles = __webpack_require__(14);
 module.exports = function (model, update) {
   // Assign container
   var main = elt('div', { class: styles.main });
+  // Add header
+  main.appendChild(header());
+  // Add search panel
   main.appendChild(searchPanel(model, update));
 
   // Do not continue if data still loading!
@@ -637,7 +703,36 @@ module.exports = function (model, update) {
 };
 
 /***/ }),
-/* 9 */
+/* 11 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _require = __webpack_require__(0),
+    elt = _require.elt;
+/**
+ * Header
+ *
+ * Simple header component.
+ * Composed of title & sub element
+ * @return {Node}
+ */
+
+
+module.exports = function () {
+  var main = elt('div');
+  var titleText = 'Patient Lookup';
+  var subText = 'Please use the search fields to look up patient records. Click on a patient to see more info';
+  var title = elt('h1', null, titleText);
+  var sub = elt('h2', null, subText);
+  main.appendChild(title);
+  main.appendChild(sub);
+  return main;
+};
+
+/***/ }),
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -653,7 +748,7 @@ var _require = __webpack_require__(0),
 var _require2 = __webpack_require__(1),
     SET_SEARCH_QUERY = _require2.SET_SEARCH_QUERY;
 
-var clearSearchButton = __webpack_require__(10);
+var clearSearchButton = __webpack_require__(13);
 
 /**
  * searchPanel
@@ -705,7 +800,7 @@ module.exports = function (model, update) {
       }, 0);
     }
     // Add label & input
-    inputContainer.appendChild(elt('label', { name: field, for: field }, field));
+    inputContainer.appendChild(elt('label', { name: field, for: field }, inputs[field].label));
     inputContainer.appendChild(input);
     main.appendChild(inputContainer);
   });
@@ -759,7 +854,7 @@ module.exports = function (model, update) {
 };
 
 /***/ }),
-/* 10 */
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -791,7 +886,7 @@ module.exports = function (update) {
 };
 
 /***/ }),
-/* 11 */
+/* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -814,7 +909,7 @@ module.exports = function () {
 };
 
 /***/ }),
-/* 12 */
+/* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -867,7 +962,7 @@ module.exports = function (model, update) {
 };
 
 /***/ }),
-/* 13 */
+/* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -922,7 +1017,7 @@ module.exports = function (model, update) {
 };
 
 /***/ }),
-/* 14 */
+/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -933,7 +1028,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 15 */
+/* 18 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -942,10 +1037,10 @@ module.exports = {
 var _require = __webpack_require__(0),
     elt = _require.elt;
 
-var selectedTable = __webpack_require__(16);
-var clearPatientButton = __webpack_require__(17);
+var selectedTable = __webpack_require__(19);
+var clearPatientButton = __webpack_require__(20);
 
-var styles = __webpack_require__(18);
+var styles = __webpack_require__(21);
 
 /**
  * selectedView
@@ -964,7 +1059,7 @@ module.exports = function (model, update) {
 };
 
 /***/ }),
-/* 16 */
+/* 19 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1025,7 +1120,7 @@ module.exports = function (model) {
 };
 
 /***/ }),
-/* 17 */
+/* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1059,7 +1154,7 @@ module.exports = function (update) {
 };
 
 /***/ }),
-/* 18 */
+/* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1067,68 +1162,6 @@ module.exports = function (update) {
 
 module.exports = {
   main: ''
-};
-
-/***/ }),
-/* 19 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-/**
- * inputOptions
- * @type {Object}
- */
-module.exports = {
-  firstName: {
-    label: 'First Name',
-    value: ''
-  },
-  lastName: {
-    label: 'Last Name',
-    value: ''
-  },
-  zipCode: {
-    label: 'Zip Code',
-    value: ''
-  }
-};
-
-/***/ }),
-/* 20 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-/**
- * selectOptions
- * @type {Object}
- */
-module.exports = {
-  sort: {
-    value: '',
-    options: [{
-      label: 'First Name (Ascending)',
-      value: 'firstName%20ASC'
-    }, {
-      label: 'First Name (Descending)',
-      value: 'firstName%20DESC'
-    }, {
-      label: 'Last Name (Ascending)',
-      value: 'lastName%20ASC'
-    }, {
-      label: 'Last Name (Descending)',
-      value: 'lastName%20DESC'
-    }, {
-      label: 'Date of Birth (Ascending)',
-      value: 'dateOfBirth%20ASC'
-    }, {
-      label: 'Date of Birth (Descending)',
-      value: 'dateOfBirth%20DESC'
-    }]
-  }
 };
 
 /***/ })

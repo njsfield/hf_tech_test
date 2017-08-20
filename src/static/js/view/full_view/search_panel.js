@@ -55,7 +55,7 @@ module.exports = (model, update) => {
     }
     // Add label & input
     inputContainer.appendChild(
-      elt('label', { name: field, for: field }, field)
+      elt('label', { name: field, for: field }, inputs[field].label)
     );
     inputContainer.appendChild(input);
     main.appendChild(inputContainer);
