@@ -1,5 +1,7 @@
 const { elt } = require('../../../../utils');
 
+const styles = require('./styles');
+
 /**
  * selectedTable
  *
@@ -12,7 +14,7 @@ module.exports = model => {
   // Hold temp
   const s = model.selectedPatient;
   // Create Container
-  const table = elt('table');
+  const table = elt('table', { class: styles.table });
   // Prepare fields used
   const data = [
     {
@@ -57,9 +59,9 @@ module.exports = model => {
     .map(
       item =>
         `
-        <tr>
-          <th>${item.label}</th>
-          <td>${item.value}</td>
+        <tr class="${styles.tableRow}">
+          <th class="${styles.tableHead}">${item.label}</th>
+          <td class="${styles.tableCell}">${item.value}</td>
         </tr>
         `
     )

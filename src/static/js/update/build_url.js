@@ -26,7 +26,10 @@ module.exports = (baseUrl, params) => {
     baseUrl +
     keys(params)
       .reduce(
-        (acc, cur) => (params[cur] ? `${acc}${cur}=${params[cur]}&` : acc),
+        (acc, cur) =>
+          params[cur]
+            ? `${acc}${cur}=${params[cur].toString().toLowerCase()}&`
+            : acc,
         '?'
       )
       .replace(/&$/, '');

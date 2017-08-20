@@ -23,8 +23,8 @@ module.exports = (model, update) => {
   // Build head html
   table.innerHTML = `
     <tr class="ba">
-      <th class="${styles.tableHead}">Last name</th>
       <th class="${styles.tableHead}">First name</th>
+      <th class="${styles.tableHead}">Last name</th>
       <th class="${styles.tableHead}">Date of Birth</th>
     </tr>
     `;
@@ -34,8 +34,8 @@ module.exports = (model, update) => {
     const row = elt('tr', { class: styles.tableRow });
     // Set data in each row
     row.innerHTML = `
-      <td class="${styles.tableCell}">${rec.lastName}</td>
       <td class="${styles.tableCell}">${rec.firstName}</td>
+      <td class="${styles.tableCell}">${rec.lastName}</td>
       <td class="${styles.tableCell}">${rec.dateOfBirth.split('T')[0]}</td>
     `;
     // Bind click to SELECT_PATIENT msg

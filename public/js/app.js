@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 2);
+/******/ 	return __webpack_require__(__webpack_require__.s = 3);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -212,10 +212,10 @@ exports.hasTruthyValues = function (obj) {
 var _require = __webpack_require__(0),
     combine = _require.combine;
 
-var flattenSearchFilters = __webpack_require__(3);
-var constants = __webpack_require__(4);
-var inputOptions = __webpack_require__(5);
-var selectOptions = __webpack_require__(6);
+var flattenSearchFilters = __webpack_require__(4);
+var constants = __webpack_require__(5);
+var inputOptions = __webpack_require__(6);
+var selectOptions = __webpack_require__(7);
 
 /**
  * initialModel
@@ -245,6 +245,34 @@ module.exports = combine({
 "use strict";
 
 
+module.exports = {
+  viewContainer: 'w-100 ba bw3 ma0 mt5-ns pa4-ns pa2 dib',
+  title: 'sans-serif f2',
+  sub: 'sans-serif f4 fw3',
+  searchPanelContainer: 'ba b--silver bl-0 br-0 pv2 flex-l flex-xl items-center-l justify-between',
+  inputContainer: 'flex-l flex-xl items-center-l',
+  input: 'w-100 w-50-l outline-0 bg-light-gray pa0 border-box blue',
+  inputLabel: 'sans-serif pa2-l pl0-l fw6 f6',
+  select: 'w-100 w-auto-l outline-0 pa2 bg-light-gray blue',
+  selectLabel: 'sans-serif pa2-l pl0-l fw6 f6',
+  clearSearchButtonContainer: 'w-100 w4-l mv2 ma2-l mr0-l pointer flex justify-end',
+  clearSearchButton: 'bg-black white bn w-100 pointer pa1 br2',
+  table: 'w-100 collapse ba b--silver',
+  tableHead: 'tl bb b--light-gray sans-serif bg-blue white pa2',
+  tableRow: 'bb sans-serif fw3 pointer stripe-light',
+  tableCell: 'ph2 pv1',
+  paginationContainer: 'pv2 flex items-center justify-end',
+  paginationSelect: 'san-serif pr2',
+  paginationLabel: 'san-serif pr1 outline-0'
+};
+
+/***/ }),
+/* 3 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
 var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
 
 var _require = __webpack_require__(0),
@@ -261,9 +289,9 @@ var _require2 = __webpack_require__(1),
 // Main update
 
 
-var update = __webpack_require__(7);
+var update = __webpack_require__(8);
 // Main view
-var view = __webpack_require__(9);
+var view = __webpack_require__(10);
 
 // Initialise view log
 
@@ -351,7 +379,7 @@ var init = function init() {
 init();
 
 /***/ }),
-/* 3 */
+/* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -376,7 +404,7 @@ module.exports = function (searchFilters) {
 };
 
 /***/ }),
-/* 4 */
+/* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -398,7 +426,7 @@ exports.CLEAR_SELECTED_PATIENT = 'CLEAR_SELECTED_PATIENT';
 exports.NO_OP = 'NO_OP';
 
 /***/ }),
-/* 5 */
+/* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -424,7 +452,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 6 */
+/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -461,7 +489,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 7 */
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -480,7 +508,7 @@ var _require = __webpack_require__(1),
     flattenSearchFilters = _require.flattenSearchFilters,
     initialModel = _require.initialModel;
 
-var buildUrl = __webpack_require__(8);
+var buildUrl = __webpack_require__(9);
 
 var _require2 = __webpack_require__(0),
     combine = _require2.combine,
@@ -583,7 +611,7 @@ module.exports = function () {
 };
 
 /***/ }),
-/* 8 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -620,20 +648,20 @@ module.exports = function (baseUrl, params) {
 
   // build full query
   var fullUrl = baseUrl + keys(params).reduce(function (acc, cur) {
-    return params[cur] ? '' + acc + cur + '=' + params[cur] + '&' : acc;
+    return params[cur] ? '' + acc + cur + '=' + params[cur].toString().toLowerCase() + '&' : acc;
   }, '?').replace(/&$/, '');
   log('BASE URL WITH QUERY USED:', fullUrl);
   return fullUrl;
 };
 
 /***/ }),
-/* 9 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var fullView = __webpack_require__(10);
+var fullView = __webpack_require__(11);
 var selectedView = __webpack_require__(18);
 
 /**
@@ -658,7 +686,7 @@ module.exports = function (model, update) {
 };
 
 /***/ }),
-/* 10 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -667,13 +695,13 @@ module.exports = function (model, update) {
 var _require = __webpack_require__(0),
     elt = _require.elt;
 
-var header = __webpack_require__(11);
-var searchPanel = __webpack_require__(12);
-var loading = __webpack_require__(14);
-var patientTable = __webpack_require__(15);
-var pagination = __webpack_require__(16);
+var header = __webpack_require__(12);
+var searchPanel = __webpack_require__(13);
+var loading = __webpack_require__(15);
+var patientTable = __webpack_require__(16);
+var pagination = __webpack_require__(17);
 
-var styles = __webpack_require__(17);
+var styles = __webpack_require__(2);
 /**
  * fullView
  *
@@ -704,7 +732,7 @@ module.exports = function (model, update) {
 };
 
 /***/ }),
-/* 11 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -713,7 +741,7 @@ module.exports = function (model, update) {
 var _require = __webpack_require__(0),
     elt = _require.elt;
 
-var styles = __webpack_require__(17);
+var styles = __webpack_require__(2);
 /**
  * Header
  *
@@ -733,7 +761,7 @@ module.exports = function () {
 };
 
 /***/ }),
-/* 12 */
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -749,9 +777,9 @@ var _require = __webpack_require__(0),
 var _require2 = __webpack_require__(1),
     SET_SEARCH_QUERY = _require2.SET_SEARCH_QUERY;
 
-var clearSearchButton = __webpack_require__(13);
+var clearSearchButton = __webpack_require__(14);
 
-var styles = __webpack_require__(17);
+var styles = __webpack_require__(2);
 
 /**
  * searchPanel
@@ -858,7 +886,7 @@ module.exports = function (model, update) {
 };
 
 /***/ }),
-/* 13 */
+/* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -870,7 +898,7 @@ var _require = __webpack_require__(0),
 var _require2 = __webpack_require__(1),
     CLEAR_SEARCH = _require2.CLEAR_SEARCH;
 
-var styles = __webpack_require__(17);
+var styles = __webpack_require__(2);
 /**
  * clearSearchButton
  *
@@ -894,7 +922,7 @@ module.exports = function (update) {
 };
 
 /***/ }),
-/* 14 */
+/* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -917,7 +945,7 @@ module.exports = function () {
 };
 
 /***/ }),
-/* 15 */
+/* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -937,7 +965,7 @@ var _require3 = __webpack_require__(0),
 
 log = log('PATIENT TABLE');
 
-var styles = __webpack_require__(17);
+var styles = __webpack_require__(2);
 
 /**
  * patientTable
@@ -953,13 +981,13 @@ module.exports = function (model, update) {
   // Build table view
   var table = elt('table', { class: styles.table });
   // Build head html
-  table.innerHTML = '\n    <tr class="ba">\n      <th class="' + styles.tableHead + '">Last name</th>\n      <th class="' + styles.tableHead + '">First name</th>\n      <th class="' + styles.tableHead + '">Date of Birth</th>\n    </tr>\n    ';
+  table.innerHTML = '\n    <tr class="ba">\n      <th class="' + styles.tableHead + '">First name</th>\n      <th class="' + styles.tableHead + '">Last name</th>\n      <th class="' + styles.tableHead + '">Date of Birth</th>\n    </tr>\n    ';
   // Use each record to build a row
   model.data.content.forEach(function (rec) {
     // Initialise tr container
     var row = elt('tr', { class: styles.tableRow });
     // Set data in each row
-    row.innerHTML = '\n      <td class="' + styles.tableCell + '">' + rec.lastName + '</td>\n      <td class="' + styles.tableCell + '">' + rec.firstName + '</td>\n      <td class="' + styles.tableCell + '">' + rec.dateOfBirth.split('T')[0] + '</td>\n    ';
+    row.innerHTML = '\n      <td class="' + styles.tableCell + '">' + rec.firstName + '</td>\n      <td class="' + styles.tableCell + '">' + rec.lastName + '</td>\n      <td class="' + styles.tableCell + '">' + rec.dateOfBirth.split('T')[0] + '</td>\n    ';
     // Bind click to SELECT_PATIENT msg
     row.addEventListener('click', function () {
       log('SELECTED: ', rec.firstName, rec.lastName);
@@ -972,7 +1000,7 @@ module.exports = function (model, update) {
 };
 
 /***/ }),
-/* 16 */
+/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -986,7 +1014,7 @@ var _require = __webpack_require__(0),
 var _require2 = __webpack_require__(1),
     SET_SEARCH_QUERY = _require2.SET_SEARCH_QUERY;
 
-var styles = __webpack_require__(17);
+var styles = __webpack_require__(2);
 
 /**
  * pagination
@@ -1027,34 +1055,6 @@ module.exports = function (model, update) {
 };
 
 /***/ }),
-/* 17 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-module.exports = {
-  viewContainer: 'w-100 ba bw3 ma0 mt5-ns pa4-ns pa2 dib',
-  title: 'sans-serif f2',
-  sub: 'sans-serif f4 fw3',
-  searchPanelContainer: 'ba b--silver bl-0 br-0 pv2 flex-l flex-xl items-center-l justify-between',
-  inputContainer: 'flex-l flex-xl items-center-l',
-  input: 'w-100 w-50-l outline-0 bg-light-gray pa0 border-box blue',
-  inputLabel: 'sans-serif pa2-l pl0-l fw6',
-  select: 'w-100 w-auto-l outline-0 pa2 bg-light-gray blue',
-  selectLabel: 'sans-serif pa2-l pl0-l fw6',
-  clearSearchButtonContainer: 'w-100 w4-l mv2 ma2-l mr0-l pointer flex justify-end',
-  clearSearchButton: 'bg-black white bn w-100 pointer pa1 br2',
-  table: 'w-100 collapse ba b--silver',
-  tableHead: 'tl bb b--light-gray sans-serif bg-blue white pa2',
-  tableRow: 'bb sans-serif fw3 pointer stripe-light',
-  tableCell: 'ph2 pv1',
-  paginationContainer: 'pv2 flex items-center justify-end',
-  paginationSelect: 'san-serif pr2',
-  paginationLabel: 'san-serif pr1 outline-0'
-};
-
-/***/ }),
 /* 18 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -1079,7 +1079,7 @@ var styles = __webpack_require__(21);
  */
 module.exports = function (model, update) {
   // Add back button
-  var main = elt('div', { class: styles.main });
+  var main = elt('div', { class: styles.viewContainer });
   main.appendChild(selectedTable(model));
   main.appendChild(clearPatientButton(update));
   return main;
@@ -1095,6 +1095,8 @@ module.exports = function (model, update) {
 var _require = __webpack_require__(0),
     elt = _require.elt;
 
+var styles = __webpack_require__(21);
+
 /**
  * selectedTable
  *
@@ -1103,13 +1105,11 @@ var _require = __webpack_require__(0),
  * @param  {Object} model
  * @return {Node} - table element
  */
-
-
 module.exports = function (model) {
   // Hold temp
   var s = model.selectedPatient;
   // Create Container
-  var table = elt('table');
+  var table = elt('table', { class: styles.table });
   // Prepare fields used
   var data = [{
     label: 'Prefix',
@@ -1141,7 +1141,7 @@ module.exports = function (model) {
   }];
   // Map data into table cells
   table.innerHTML = data.map(function (item) {
-    return '\n        <tr>\n          <th>' + item.label + '</th>\n          <td>' + item.value + '</td>\n        </tr>\n        ';
+    return '\n        <tr class="' + styles.tableRow + '">\n          <th class="' + styles.tableHead + '">' + item.label + '</th>\n          <td class="' + styles.tableCell + '">' + item.value + '</td>\n        </tr>\n        ';
   }).join('');
   return table;
 };
@@ -1158,6 +1158,8 @@ var _require = __webpack_require__(0),
 
 var _require2 = __webpack_require__(1),
     CLEAR_SELECTED_PATIENT = _require2.CLEAR_SELECTED_PATIENT;
+
+var styles = __webpack_require__(21);
 /**
  * clearButtonView
  *
@@ -1169,10 +1171,8 @@ var _require2 = __webpack_require__(1),
  * @param  {Function} update - main update function
  * @return {Node} - button element
  */
-
-
 module.exports = function (update) {
-  var button = elt('button', null, 'Back');
+  var button = elt('button', { class: styles.clearPatientButton }, 'Back');
   button.addEventListener('click', function (e) {
     e.preventDefault();
     update({ type: CLEAR_SELECTED_PATIENT });
@@ -1188,7 +1188,12 @@ module.exports = function (update) {
 
 
 module.exports = {
-  main: ''
+  viewContainer: 'w-100 vh-100 bg-blue pv5 pa4-ns ph6-l pv7-l pa2 dib',
+  table: 'w-100 mw6 collapse',
+  tableHead: 'tl sans-serif moon-gray fw5',
+  tableRow: '',
+  tableCell: 'tl sans-serif white fw2',
+  clearPatientButton: 'bg-white black bn w4 pointer pa3 br2 mv4'
 };
 
 /***/ })

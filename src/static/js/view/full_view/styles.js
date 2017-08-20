@@ -6,9 +6,9 @@ module.exports = {
     'ba b--silver bl-0 br-0 pv2 flex-l flex-xl items-center-l justify-between',
   inputContainer: 'flex-l flex-xl items-center-l',
   input: 'w-100 w-50-l outline-0 bg-light-gray pa0 border-box blue',
-  inputLabel: 'sans-serif pa2-l pl0-l fw6',
+  inputLabel: 'sans-serif pa2-l pl0-l fw6 f6',
   select: 'w-100 w-auto-l outline-0 pa2 bg-light-gray blue',
-  selectLabel: 'sans-serif pa2-l pl0-l fw6',
+  selectLabel: 'sans-serif pa2-l pl0-l fw6 f6',
   clearSearchButtonContainer:
     'w-100 w4-l mv2 ma2-l mr0-l pointer flex justify-end',
   clearSearchButton: 'bg-black white bn w-100 pointer pa1 br2',

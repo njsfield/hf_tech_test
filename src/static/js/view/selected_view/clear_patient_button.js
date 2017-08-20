@@ -1,5 +1,7 @@
 const { elt } = require('../../../../utils');
 const { CLEAR_SELECTED_PATIENT } = require('../../model');
+
+const styles = require('./styles');
 /**
  * clearButtonView
  *
@@ -12,7 +14,7 @@ const { CLEAR_SELECTED_PATIENT } = require('../../model');
  * @return {Node} - button element
  */
 module.exports = update => {
-  const button = elt('button', null, 'Back');
+  const button = elt('button', { class: styles.clearPatientButton }, 'Back');
   button.addEventListener('click', e => {
     e.preventDefault();
     update({ type: CLEAR_SELECTED_PATIENT });

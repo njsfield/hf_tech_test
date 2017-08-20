@@ -15,7 +15,7 @@ const styles = require('./styles');
  */
 module.exports = (model, update) => {
   // Add back button
-  const main = elt('div', { class: styles.main });
+  const main = elt('div', { class: styles.viewContainer });
   main.appendChild(selectedTable(model));
   main.appendChild(clearPatientButton(update));
   return main;
