@@ -1,4 +1,4 @@
-const server  = require('./src');
+const server = require('./src');
 const { log } = require('./src/utils');
 const _log = log('SERVER');
 

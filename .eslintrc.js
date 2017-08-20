@@ -12,7 +12,9 @@ module.exports = {
       "prettier"
   ],
   "rules": {
-      "prettier/prettier": ["error", { "singleQuote": true }],
-      "quotes": ["error", "single"]
+      "prettier/prettier": [
+        "error", { "singleQuote": true }
+      ],
+      "no-unused-vars": [1, { "vars": "local", "args": "after-used" }]
   }
 };
