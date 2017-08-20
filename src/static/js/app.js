@@ -83,5 +83,3 @@ const init = () => {
 
 // Initialise
 init();
-
-module.exports = mainUpdate;

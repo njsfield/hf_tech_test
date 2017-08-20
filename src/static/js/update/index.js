@@ -8,63 +8,13 @@ const {
   SELECT_PATIENT,
   CLEAR_SELECTED_PATIENT,
   NO_OP,
+  flattenSearchFilters,
   initialModel
-} = require('./model');
+} = require('../model');
 
-const { combine, getJson, keys, hasTruthyValues } = require('../../utils');
+const buildUrl = require('./build_url');
 
-// Initialise view log
-let { log } = require('../../utils');
-log = log('UPDATE');
-
-/**
- * flattenSearchFilters
- *
- * Normalise searchFilter object
- * into flattened value
- * @param  {Object} searchFilters
- * @return {Object}
- */
-const flattenSearchFilters = searchFilters => {
-  return {
-    firstName: searchFilters.inputs.firstName.value,
-    lastName: searchFilters.inputs.lastName.value,
-    zipCode: searchFilters.inputs.zipCode.value,
-    sort: searchFilters.selects.sort.value,
-    page: searchFilters.page
-  };
-};
-
-/**
- * buildUrl
- *
- * Takes a base url & (optional)
- * params object to build query
- *
- * @param  {String} baseUrl - initial URL
- * @param  {Object} options - options
- * @return {String} - final url
- */
-const buildUrl = (baseUrl, params) => {
-  // If no params or all param values are empty
-  // Return base url
-  if (!params || hasTruthyValues(params) === false) {
-    log('BASE URL USED:', baseUrl);
-    return baseUrl;
-  }
-
-  // build full query
-  const fullUrl =
-    baseUrl +
-    keys(params)
-      .reduce(
-        (acc, cur) => (params[cur] ? `${acc}${cur}=${params[cur]}&` : acc),
-        '?'
-      )
-      .replace(/&$/, '');
-  log('BASE URL WITH QUERY USED:', fullUrl);
-  return fullUrl;
-};
+const { combine, getJson } = require('../../../utils');
 
 /**
  * update

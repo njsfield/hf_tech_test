@@ -1,0 +1,14 @@
+/**
+ * constants (used for update)
+ * @type {String}
+ */
+
+exports.SET_BASE_URL = 'SET_BASE_URL';
+exports.SET_SEARCH_QUERY = 'SET_SEARCH_QUERY';
+exports.CLEAR_SEARCH = 'CLEAR_SEARCH';
+exports.GET_DATA_REQUEST = 'GET_DATA_REQUEST';
+exports.GET_DATA_SUCCESS = 'GET_DATA_SUCCESS';
+exports.GET_DATA_FAILURE = 'GET_DATA_FAILURE';
+exports.SELECT_PATIENT = 'SELECT_PATIENT';
+exports.CLEAR_SELECTED_PATIENT = 'CLEAR_SELECTED_PATIENT';
+exports.NO_OP = 'NO_OP';
