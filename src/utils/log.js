@@ -12,12 +12,11 @@ const util = require('util');
  * @return {Function} - return function to call with
  * standard args
  */
-const log = (setting) => {
-
+const log = setting => {
   // Use setting as prefix before main call
-  function main (...args) {
+  function main(...args) {
     console.log(`${setting}: `, ...args);
-  };
+  }
 
   /**
    * obj
@@ -28,8 +27,8 @@ const log = (setting) => {
    * @param  {Object} object
    * @return {Object} (formatted)
    */
-  const obj = (object) =>
-    util.inspect(object, {showHidden: false, depth: null, colors: true});
+  const obj = object =>
+    util.inspect(object, { showHidden: false, depth: null, colors: true });
 
   // Add as available method
   main.obj = obj;

@@ -31,7 +31,7 @@ const log = (...args) => console.log(...args);
  * @param  {num} num - increment amount (last item = num-1)
  * @return {Array} - integer array
  */
-const countArr = (num) => Array.from(Array(num).keys());
+const countArr = num => Array.from(Array(num).keys());
 
 /**
  * elt
@@ -123,7 +123,7 @@ const selectOptions = {
       {
         label: 'Date of Birth (Descending)',
         value: 'dateOfBirth%20DESC'
-      },
+      }
     ]
   }
 };
@@ -142,7 +142,7 @@ const initialModel = {
     page: 0
   },
   baseUrl: 'https://api.interview.healthforge.io:443/api/patient',
-  selectedPatient: null,
+  selectedPatient: null
 };
 
 /**
@@ -162,14 +162,16 @@ let GLOBAL_MODEL = combine({}, initialModel);
  *
  * @return {Promise} - return promise
  */
-const getData = (options) =>
-  new Promise((res,rej) => {
+const getData = options =>
+  new Promise((res, rej) => {
     fetch(options.url, {
       method: options.method || 'get',
       mode: 'cors',
-      headers: new Headers(options.headers || {
-        'Accept': 'application/json'
-      })
+      headers: new Headers(
+        options.headers || {
+          Accept: 'application/json'
+        }
+      )
     })
       .then(response => {
         return response.json();
@@ -207,9 +209,15 @@ const buildUrl = (baseUrl, options) => {
     return baseUrl;
   }
 
-  const fullQuery = baseUrl + keys(flattened)
-    .reduce((acc,cur) => flattened[cur] ? `${acc}${cur}=${flattened[cur]}&` : acc, '?')
-    .replace(/&$/, '');
+  const fullQuery =
+    baseUrl +
+    keys(flattened)
+      .reduce(
+        (acc, cur) =>
+          flattened[cur] ? `${acc}${cur}=${flattened[cur]}&` : acc,
+        '?'
+      )
+      .replace(/&$/, '');
   log('USING ENHANCED QUERY', fullQuery);
   return fullQuery;
 };
@@ -225,13 +233,12 @@ const buildUrl = (baseUrl, options) => {
  * @param  {Object} model - main model
  * @return {Node} - DOM node
  */
-const view = (model) => {
+const view = model => {
   // View 1. For main view
   if (!model.selectedPatient) {
     return fullView(model);
-  }
-  // View 2. For selected patient
-  else {
+  } else {
+    // View 2. For selected patient
     return selectedView(model);
   }
 };
@@ -244,7 +251,7 @@ const view = (model) => {
  * @param  {Object} model
  * @return {Node} - DOM node
  */
-const fullView = (model) => {
+const fullView = model => {
   // Assign container
   const main = elt('div');
   // Build top search view
@@ -272,7 +279,7 @@ const fullView = (model) => {
   // Use each record to build a row
   model.data.content.forEach(rec => {
     // Initialise tr container
-    const row = elt('tr', {class: 'pointer'});
+    const row = elt('tr', { class: 'pointer' });
     // Set data in each row
     row.innerHTML = `
       <td>${rec.lastName}</td>
@@ -282,7 +289,7 @@ const fullView = (model) => {
     // Bind click to SELECT_PATIENT msg
     row.addEventListener('click', () => {
       log('SELECTED: ', rec.firstName, rec.lastName);
-      update({type: SELECT_PATIENT, payload: rec});
+      update({ type: SELECT_PATIENT, payload: rec });
     });
     // Add each row
     tableView.appendChild(row);
@@ -300,7 +307,7 @@ const fullView = (model) => {
  * @param  {Object} model
  * @return {String} - html string
  */
-const selectedView = (model) => {
+const selectedView = model => {
   // Hold temp
   const s = model.selectedPatient;
   // Create Container
@@ -372,7 +379,7 @@ const clearSearchButton = () => {
   const button = elt('button', null, 'Clear');
   button.addEventListener('click', e => {
     e.preventDefault();
-    update({type: CLEAR_SEARCH});
+    update({ type: CLEAR_SEARCH });
   });
   return button;
 };
@@ -388,9 +395,9 @@ const clearSearchButton = () => {
 const clearPatientButton = () => {
   const button = elt('button');
   button.innerHTML = 'Back';
-  button.addEventListener('click', (e) => {
+  button.addEventListener('click', e => {
     e.preventDefault();
-    update({type: CLEAR_SELECTED_PATIENT});
+    update({ type: CLEAR_SELECTED_PATIENT });
   });
   return button;
 };
@@ -405,7 +412,7 @@ const clearPatientButton = () => {
  * @return {Node} - dom node
  */
 
-const searchControls = (model) => {
+const searchControls = model => {
   const main = elt('div');
 
   // 1. Extract inputs and build each
@@ -413,7 +420,7 @@ const searchControls = (model) => {
   keys(inputs).forEach(field => {
     // Define container
     const inputContainer = elt('div');
-    const input = elt('input', {class: 'outline-0'});
+    const input = elt('input', { class: 'outline-0' });
     input.name = field;
     input.id = field;
     input.value = inputs[field].value;
@@ -422,8 +429,9 @@ const searchControls = (model) => {
       // Assign the corresponding input field the new value
       // Update the lastModified key to indicate this is the
       // latest control key that has been altered
-      update({type: SET_SEARCH_QUERY, payload: combine(model.searchQuery,
-        {
+      update({
+        type: SET_SEARCH_QUERY,
+        payload: combine(model.searchQuery, {
           inputs: combine(inputs, {
             [field]: {
               value: e.target.value,
@@ -441,10 +449,12 @@ const searchControls = (model) => {
       // user has begun typing
       setTimeout(() => {
         input.focus();
-      },0);
+      }, 0);
     }
     // Add label & input
-    inputContainer.appendChild(elt('label', {name: field, for: field}, field));
+    inputContainer.appendChild(
+      elt('label', { name: field, for: field }, field)
+    );
     inputContainer.appendChild(input);
     main.appendChild(inputContainer);
   });
@@ -453,26 +463,41 @@ const searchControls = (model) => {
   const { selects } = model.searchQuery;
   keys(selects).forEach(field => {
     const selectContainer = elt('div');
-    const select = elt('select', {class: 'outline-0'});
+    const select = elt('select', { class: 'outline-0' });
     select.name = field;
     selects[field].options.forEach(option => {
       // Add options
       // Set value to label option
       // Use 'selected' key on an option that matches
       // associated value in model
-      select.appendChild(elt('option', selects[field].value === option.value ? { selected: true } : null, option.label));
+      select.appendChild(
+        elt(
+          'option',
+          selects[field].value === option.value ? { selected: true } : null,
+          option.label
+        )
+      );
     });
     // Allow empty option, select it if nothing selected in model
-    select.appendChild(elt('option', selects[field].value ? null : { selected: true }, 'Choose an option...'));
+    select.appendChild(
+      elt(
+        'option',
+        selects[field].value ? null : { selected: true },
+        'Choose an option...'
+      )
+    );
     select.addEventListener('change', e => {
       // Find value from label by searching model
-      const valueFromLabel = selects[field].options.find(x => x.label === e.target.value);
+      const valueFromLabel = selects[field].options.find(
+        x => x.label === e.target.value
+      );
 
       // Don't run any query if user selects empty option
       if (!valueFromLabel) return;
       // search query requires a modified searchQuery object
-      update({type: SET_SEARCH_QUERY, payload: combine(model.searchQuery,
-        {
+      update({
+        type: SET_SEARCH_QUERY,
+        payload: combine(model.searchQuery, {
           selects: {
             [field]: {
               value: valueFromLabel.value,
@@ -485,7 +510,9 @@ const searchControls = (model) => {
       });
     });
     // Add additional label
-    selectContainer.appendChild(elt('label', {name: field, for: field}, field));
+    selectContainer.appendChild(
+      elt('label', { name: field, for: field }, field)
+    );
     selectContainer.appendChild(select);
     // Render
     main.appendChild(selectContainer);
@@ -500,21 +527,26 @@ const searchControls = (model) => {
  * selection
  * @return {Node}  - dom node
  */
-const pagination = (model) => {
+const pagination = model => {
   const main = elt('div');
   // Extract total pages
   const { totalPages, number } = model.data;
 
   const selectContainer = elt('div');
-  const select = elt('select', {class: 'outline-0'});
+  const select = elt('select', { class: 'outline-0' });
   countArr(totalPages).forEach(num => {
     // Add options
     // Set selected if num equal to number in model
-    select.appendChild(elt('option', number === num ? { selected: true } : null, num.toString() ));
+    select.appendChild(
+      elt('option', number === num ? { selected: true } : null, num.toString())
+    );
   });
-  select.addEventListener('change', (e) => {
+  select.addEventListener('change', e => {
     // Modify searchQuery with newly selected page
-    update({type: SET_SEARCH_QUERY, payload: combine(model.searchQuery, {page: e.target.value})});
+    update({
+      type: SET_SEARCH_QUERY,
+      payload: combine(model.searchQuery, { page: e.target.value })
+    });
   });
   // Add a label
   selectContainer.appendChild(elt('label', null, 'Page'));
@@ -540,72 +572,85 @@ const pagination = (model) => {
  * @param  {Object} msg - containing type & (optional) payload
  * @return {Promise}
  */
-const update = (_msg = {type: NO_OP}) => {
+const update = (_msg = { type: NO_OP }) => {
   /**
    * Internal
    */
   const _update = (msg, model) =>
-    new Promise((res) => {
-
+    new Promise(res => {
       // Toggle between message type
       switch (msg.type) {
+        case SET_BASE_URL: {
+          // Set base URL in model
+          res([null, combine(model, { baseUrl: msg.payload })]);
+          break;
+        }
 
-      case SET_BASE_URL: {
-        // Set base URL in model
-        res([null, combine(model, {baseUrl: msg.payload })]);
-        break;
-      }
+        case SET_SEARCH_QUERY: {
+          // Alter searchQuery object, then fire get request
+          res([
+            { type: GET_DATA_REQUEST },
+            combine(model, {
+              searchQuery: combine(model.searchQuery, msg.payload)
+            })
+          ]);
+          break;
+        }
 
-      case SET_SEARCH_QUERY: {
-        // Alter searchQuery object, then fire get request
-        res([{type: GET_DATA_REQUEST }, combine(model, {searchQuery: combine(model.searchQuery, msg.payload)})]);
-        break;
-      }
+        case CLEAR_SEARCH: {
+          // Reset searchQuery object, then fire get request
+          res([
+            { type: GET_DATA_REQUEST },
+            combine(model, {
+              searchQuery: combine({}, initialModel.searchQuery)
+            })
+          ]);
+          break;
+        }
 
-      case CLEAR_SEARCH: {
-        // Reset searchQuery object, then fire get request
-        res([{ type: GET_DATA_REQUEST }, combine(model, {searchQuery: combine({}, initialModel.searchQuery) })]);
-        break;
-      }
-
-      case GET_DATA_REQUEST: {
-        // 1. Use build url to compose search query url
-        // & Attempt to retrieve data
-        getData({url: buildUrl(model.baseUrl, model.searchQuery)})
-          .then(data => {
-            // Resolve
-            res([{ type: GET_DATA_SUCCESS, payload: data }, model]);
-          })
-          .catch(e => {
-            // Resolve
-            res([{ type: GET_DATA_FAILURE, payload: e }, model]);
-          });
-        break;
-      }
-      case GET_DATA_SUCCESS: {
-        // Set data key in model
-        res([null, combine(model, {data: msg.payload})]);
-        break;
-      }
-      case GET_DATA_FAILURE: {
-        // Set flash message notifying user of failure
-        res([null, combine(model, {flashMessages: { type: 'error', message: msg.payload }})]);
-        break;
-      }
-      case SELECT_PATIENT: {
-        // Set selectedPatient key
-        res([null, combine(model, {selectedPatient: msg.payload })]);
-        break;
-      }
-      case CLEAR_SELECTED_PATIENT: {
-        // Set selectedPatient key
-        res([null, combine(model, {selectedPatient: null })]);
-        break;
-      }
-      case NO_OP: {
-        // Default
-        res([null, model]);
-      }
+        case GET_DATA_REQUEST: {
+          // 1. Use build url to compose search query url
+          // & Attempt to retrieve data
+          getData({ url: buildUrl(model.baseUrl, model.searchQuery) })
+            .then(data => {
+              // Resolve
+              res([{ type: GET_DATA_SUCCESS, payload: data }, model]);
+            })
+            .catch(e => {
+              // Resolve
+              res([{ type: GET_DATA_FAILURE, payload: e }, model]);
+            });
+          break;
+        }
+        case GET_DATA_SUCCESS: {
+          // Set data key in model
+          res([null, combine(model, { data: msg.payload })]);
+          break;
+        }
+        case GET_DATA_FAILURE: {
+          // Set flash message notifying user of failure
+          res([
+            null,
+            combine(model, {
+              flashMessages: { type: 'error', message: msg.payload }
+            })
+          ]);
+          break;
+        }
+        case SELECT_PATIENT: {
+          // Set selectedPatient key
+          res([null, combine(model, { selectedPatient: msg.payload })]);
+          break;
+        }
+        case CLEAR_SELECTED_PATIENT: {
+          // Set selectedPatient key
+          res([null, combine(model, { selectedPatient: null })]);
+          break;
+        }
+        case NO_OP: {
+          // Default
+          res([null, model]);
+        }
       }
     });
 
@@ -640,7 +685,7 @@ const update = (_msg = {type: NO_OP}) => {
  *
  * @param {Node} viewNode - node returned by view function
  */
-const render = (viewNode) => {
+const render = viewNode => {
   // Reset
   GLOBAL_DOM_HOOK.innerHTML = '';
   // Build
@@ -654,7 +699,7 @@ const render = (viewNode) => {
  */
 const init = () => {
   // Start by making request on page load
-  update({type: GET_DATA_REQUEST});
+  update({ type: GET_DATA_REQUEST });
 };
 
 // Initialise

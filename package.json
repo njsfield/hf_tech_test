@@ -12,6 +12,9 @@
   "license": "ISC",
   "devDependencies": {
     "eslint": "^4.4.1",
-    "nodemon": "^1.11.0"
+    "eslint-config-prettier": "^2.3.0",
+    "eslint-plugin-prettier": "^2.2.0",
+    "nodemon": "^1.11.0",
+    "prettier": "^1.5.3"
   }
 }

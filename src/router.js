@@ -21,7 +21,7 @@ const viewRegex = /html$/;
 
 // Map route uris to views
 const routes = {
-  '/': 'index.html',
+  '/': 'index.html'
 };
 
 _log('ROUTES INITIALISED', _log.obj(routes));
@@ -76,7 +76,7 @@ const serve = (_path, res) => {
  * @param  {Object} req - request object
  * @param  {Object} res - response object
  */
-const router = (req,res) => {
+const router = (req, res) => {
   // Extract pathname from uri
   const uri = url.parse(req.url).pathname;
   _log('URI: ', uri);
@@ -94,8 +94,7 @@ const router = (req,res) => {
       const viewPath = `${VIEW_DIR}/${routes[uri]}`;
       _log('PREPARING VIEW: ', viewPath);
       serve(viewPath, res);
-    }
-    else {
+    } else {
       const notFoundPath = `${VIEW_DIR}/404.html`;
       _log('NOT FOUND: ', uri);
       _log('PREPARING NOT FOUND VIEW: ', notFoundPath);
