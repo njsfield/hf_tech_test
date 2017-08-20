@@ -8,11 +8,18 @@ const fs = require('fs');
  * @param  {String} path - path in directory tree
  * @return {Promise} - Resolve if found, reject is errors
  */
-const getFile = path =>
+exports.getFile = path =>
   new Promise((res, rej) => {
     fs.readFile(path, 'utf8', (err, file) => {
       return err ? rej(err) : res(file);
     });
   });
 
-module.exports = getFile;
+/**
+   * getFileSync
+   *
+   * Simple abstraction around fs's readFileSync
+   * @param  {String} path - path in directory tree
+   * @return {String} - file contents
+   */
+exports.getFileSync = path => fs.readFileSync(path, 'utf8');

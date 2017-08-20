@@ -1,17 +1,18 @@
 const path = require('path');
 const url = require('url');
-const { getFile, getFileSync, log } = require('./utils');
+const { getFile, getFileSync } = require('./utils/getFile');
+const { logObj } = require('./utils/logObj');
 
 // Init log for this module
-const _log = log('ROUTER');
+const log = require('./utils').log('ROUTER');
 
 // Set constants
-const STATIC_DIR = path.join(__dirname, './static');
+const STATIC_DIR = path.join(__dirname, '../public');
 const VIEW_DIR = path.join(__dirname, './views');
 
 const layoutFile = getFileSync(`${VIEW_DIR}/layout.html`);
 
-_log(layoutFile ? 'LAYOUT FILE IMPORTED' : 'LAYOUT FILE NOT FOUND');
+log(layoutFile ? 'LAYOUT FILE IMPORTED' : 'LAYOUT FILE NOT FOUND');
 
 const injectionMarker = '{{{ }}}';
 
@@ -24,7 +25,25 @@ const routes = {
   '/': 'index.html'
 };
 
-_log('ROUTES INITIALISED', _log.obj(routes));
+/**
+ * pathToContentType
+ *
+ * Map static paths to content
+ * types via their extensions
+ * @param  {String} path
+ * @return {String} 
+ */
+const pathToContentType = path => {
+  const types = {
+    js: 'text/javascript',
+    css: 'text/css',
+    ico: 'image/x-icon'
+  };
+  const staticMatch = path.match(staticRegex);
+  return staticMatch ? types[staticMatch[0]] : 'text/plain';
+};
+
+log('ROUTES INITIALISED', logObj(routes));
 
 /**
  * serve
@@ -45,18 +64,23 @@ const serve = (_path, res) => {
     .then(file => {
       // If view file requested,
       // merge into layoutFile
-      _log('FILE FOUND');
+      log('FILE FOUND');
       if (viewRegex.test(_path)) {
-        _log('FILE WAS VIEW. COMPILING...');
+        log('FILE WAS VIEW. COMPILING...');
         file = layoutFile.replace(injectionMarker, file);
+        // Set html content type header for views
+        res.setHeader('content-type', 'text/html');
+      } else {
+        // Set unique content type header for static files
+        res.setHeader('content-type', pathToContentType(_path));
       }
-      _log(_log.obj('SERVING TO CLIENT: '), _path);
-      res.writeHead(200);
+      log(logObj('SERVING TO CLIENT: '), _path);
+      // res.writeHead(200);
       res.write(file);
       res.end();
     })
     .catch(e => {
-      _log('FILE NOT FOUND: ', e);
+      log('FILE NOT FOUND: ', e);
       res.writeHead(404);
       res.write(`404 Not Found: ${e}`);
       res.end();
@@ -79,12 +103,12 @@ const serve = (_path, res) => {
 const router = (req, res) => {
   // Extract pathname from uri
   const uri = url.parse(req.url).pathname;
-  _log('URI: ', uri);
+  log('URI: ', uri);
   // Check for static file request
   if (staticRegex.test(uri)) {
     // Build full path
     const staticPath = `${STATIC_DIR}${uri}`;
-    _log('PREPARING STATIC FILE: ', staticPath);
+    log('PREPARING STATIC FILE: ', staticPath);
     serve(staticPath, res);
   } else {
     // Assert uri maps to allowed
@@ -92,12 +116,12 @@ const router = (req, res) => {
     if (routes[uri]) {
       // Build path
       const viewPath = `${VIEW_DIR}/${routes[uri]}`;
-      _log('PREPARING VIEW: ', viewPath);
+      log('PREPARING VIEW: ', viewPath);
       serve(viewPath, res);
     } else {
       const notFoundPath = `${VIEW_DIR}/404.html`;
-      _log('NOT FOUND: ', uri);
-      _log('PREPARING NOT FOUND VIEW: ', notFoundPath);
+      log('NOT FOUND: ', uri);
+      log('PREPARING NOT FOUND VIEW: ', notFoundPath);
       serve(notFoundPath, res);
     }
   }

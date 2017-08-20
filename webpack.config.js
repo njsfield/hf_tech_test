@@ -14,12 +14,13 @@ module.exports = {
     filename: 'app.js',
     path: path.join(publicPath, 'js')
   },
-
+  devtool: 'source-map',
   module: {
     loaders: [
       // Processes Javascript from webpack-build.js
       {
         test: /\.js$/,
+        exclude: /node_modules/,
         loader: 'babel-loader' // & transpile
       }
     ]
